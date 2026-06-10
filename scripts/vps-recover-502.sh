@@ -55,6 +55,11 @@ fi
 echo "--- Local domain test ---"
 curl -sI -H "Host: getindexrocket.com" http://127.0.0.1/ | head -5 || true
 
+if curl -sI -H "Host: getindexrocket.com" http://127.0.0.1/ | head -1 | grep -q 502; then
+  echo "nginx still 502 — running nginx fix..."
+  bash scripts/vps-fix-nginx.sh || true
+fi
+
 echo ""
 echo "If still 502: Cloudflare -> Purge cache"
 echo "============================================"
