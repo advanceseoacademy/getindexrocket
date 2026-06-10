@@ -56,5 +56,6 @@ fi
 
 echo "============================================"
 echo " Deploy complete"
-echo " Health: curl -s http://127.0.0.1:3000/api/health"
+PORT="${GETINDEXROCKET_PORT:-3005}"
+echo " Health: curl -s http://127.0.0.1:${PORT}/api/health"
 echo "============================================"

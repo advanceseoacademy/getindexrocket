@@ -67,13 +67,14 @@ pm2 save || true
 
 echo "--- Health check ---"
 sleep 2
-curl -s http://127.0.0.1:3000/api/health || true
+PORT="${GETINDEXROCKET_PORT:-3005}"
+curl -s "http://127.0.0.1:${PORT}/api/health" || true
 echo ""
 pm2 status || true
 
 echo ""
 echo "If https://getindexrocket.com still shows old site:"
-echo "  CyberPanel -> getindexrocket.com -> Reverse Proxy -> http://127.0.0.1:3000"
+echo "  CyberPanel -> getindexrocket.com -> Reverse Proxy -> http://127.0.0.1:3005"
 echo "  Or restart LiteSpeed: systemctl restart lsws"
 
 echo "============================================"
