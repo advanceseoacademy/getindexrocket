@@ -16,7 +16,7 @@ echo "============================================"
 cd "$APP_DIR"
 git pull origin main 2>/dev/null || true
 
-# Dedicated port — avoid conflict with advance-seo-academy on :3000
+PORT="${GETINDEXROCKET_PORT:-3005}"
 export PORT
 grep -q "GETINDEXROCKET_PORT" .env 2>/dev/null || echo "GETINDEXROCKET_PORT=$PORT" >> .env
 
@@ -24,13 +24,24 @@ pm2 delete indexflow-api 2>/dev/null || true
 pm2 delete indexflow-web 2>/dev/null || true
 pm2 delete getindexrocket 2>/dev/null || true
 
+# Ensure build exists before starting (next start needs .next)
+if [[ ! -d .next ]]; then
+  echo "Missing .next — run: SKIP_DB_MIGRATE=1 bash scripts/vps-deploy.sh"
+  exit 1
+fi
+
 PORT="$PORT" pm2 start ecosystem.config.cjs --update-env
 pm2 save
 
-sleep 3
+sleep 4
 echo "--- Health on :$PORT ---"
-curl -s "http://127.0.0.1:${PORT}/api/health" || true
-echo ""
+HEALTH="$(curl -sf "http://127.0.0.1:${PORT}/api/health" || echo FAIL)"
+echo "$HEALTH"
+if [[ "$HEALTH" == "FAIL" ]] || [[ "$HEALTH" != *"ok"* ]]; then
+  echo "App not responding — check: pm2 logs getindexrocket --lines 50"
+  pm2 logs getindexrocket --lines 20 --nostream || true
+  exit 1
+fi
 
 if [[ -f "$VHOST" ]]; then
   cp "$VHOST" "${VHOST}.bak.$(date +%s)"
