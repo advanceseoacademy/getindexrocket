@@ -65,7 +65,7 @@ export const DEFAULT_KEYWORDS = [
   "link indexing",
   "seo indexing",
   "bulk url submission",
-  "IndexRocket",
+  "GetindexRocket",
   "getindexrocket",
 ];
 

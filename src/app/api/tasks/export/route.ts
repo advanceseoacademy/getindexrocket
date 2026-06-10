@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/auth";
+import { APP_SLUG } from "@/lib/brand";
 import { displayStatus } from "@/lib/indexing-status";
 import { prisma } from "@/lib/prisma";
 
@@ -41,7 +42,7 @@ export async function GET() {
   }
 
   const body = rows.join("\n");
-  const filename = `indexrocket-report-${new Date().toISOString().slice(0, 10)}.csv`;
+  const filename = `${APP_SLUG}-report-${new Date().toISOString().slice(0, 10)}.csv`;
 
   return new Response(body, {
     headers: {

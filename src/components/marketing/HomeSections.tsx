@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { APP_NAME } from "@/lib/brand";
 import { FAQ_ITEMS } from "./faq-data";
 
 const FEATURES = [
@@ -128,7 +129,7 @@ export function HomeSections() {
       </section>
 
       <section className="section-below-fold site-container py-20">
-        <h2 className="text-2xl font-bold md:text-3xl">Who uses IndexRocket</h2>
+        <h2 className="text-2xl font-bold md:text-3xl">Who uses {APP_NAME}</h2>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {USE_CASES.map((u) => (
             <div

@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
     "url indexing cost",
     "seo indexing plans",
     "link indexing credits",
-    "getindexrocket pricing",
+    "GetindexRocket pricing",
   ],
 });
 

@@ -13,7 +13,7 @@ export const metadata = buildPageMetadata({
   description:
     `Create your ${APP_NAME} account to submit backlinks for indexing. 1 credit = 1 URL. Purchase credits via membership plans.`,
   path: "/register",
-  keywords: ["backlink indexing signup", "url indexing register", "IndexRocket register"],
+  keywords: ["backlink indexing signup", "url indexing register", "GetindexRocket register"],
 });
 
 export default function RegisterPage() {
