@@ -1,5 +1,5 @@
--- Run in Supabase Dashboard → SQL Editor
--- Creates all GetIndexRocket tables
+-- Full schema bootstrap (matches prisma/schema.prisma)
+-- Prefer: npm run db:migrate:deploy
 
 CREATE TABLE IF NOT EXISTS "User" (
     "id" TEXT NOT NULL,
@@ -13,9 +13,50 @@ CREATE TABLE IF NOT EXISTS "User" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
-
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX IF NOT EXISTS "User_googleId_key" ON "User"("googleId");
+
+CREATE TABLE IF NOT EXISTS "PaymentEvent" (
+    "id" TEXT NOT NULL,
+    "externalId" TEXT NOT NULL,
+    "userId" TEXT,
+    "email" TEXT NOT NULL,
+    "amountUsd" DOUBLE PRECISION NOT NULL,
+    "creditsAdded" INTEGER NOT NULL,
+    "intendedCredits" INTEGER NOT NULL DEFAULT 0,
+    "planId" TEXT,
+    "eventType" TEXT,
+    "provider" TEXT NOT NULL DEFAULT 'buymeacoffee',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "PaymentEvent_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "PaymentEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "PaymentEvent_externalId_key" ON "PaymentEvent"("externalId");
+CREATE INDEX IF NOT EXISTS "PaymentEvent_email_createdAt_idx" ON "PaymentEvent"("email", "createdAt");
+CREATE INDEX IF NOT EXISTS "PaymentEvent_userId_createdAt_idx" ON "PaymentEvent"("userId", "createdAt");
+
+CREATE TABLE IF NOT EXISTS "Membership" (
+    "id" TEXT NOT NULL,
+    "externalSubId" TEXT NOT NULL,
+    "userId" TEXT,
+    "email" TEXT NOT NULL,
+    "levelName" TEXT,
+    "levelId" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'active',
+    "amountUsd" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "paused" BOOLEAN NOT NULL DEFAULT false,
+    "cancelAtPeriodEnd" BOOLEAN NOT NULL DEFAULT false,
+    "canceledAt" TIMESTAMP(3),
+    "currentPeriodStart" TIMESTAMP(3),
+    "currentPeriodEnd" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    CONSTRAINT "Membership_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "Membership_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "Membership_externalSubId_key" ON "Membership"("externalSubId");
+CREATE INDEX IF NOT EXISTS "Membership_email_idx" ON "Membership"("email");
+CREATE INDEX IF NOT EXISTS "Membership_userId_idx" ON "Membership"("userId");
 
 CREATE TABLE IF NOT EXISTS "Session" (
     "id" TEXT NOT NULL,
@@ -26,7 +67,6 @@ CREATE TABLE IF NOT EXISTS "Session" (
     CONSTRAINT "Session_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-
 CREATE UNIQUE INDEX IF NOT EXISTS "Session_tokenHash_key" ON "Session"("tokenHash");
 CREATE INDEX IF NOT EXISTS "Session_userId_idx" ON "Session"("userId");
 
@@ -34,6 +74,7 @@ CREATE TABLE IF NOT EXISTS "Task" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "externalId" TEXT,
+    "providerTaskId" TEXT,
     "tier" TEXT NOT NULL DEFAULT 'standard',
     "status" TEXT NOT NULL DEFAULT 'pending',
     "urlsCount" INTEGER NOT NULL DEFAULT 0,
@@ -43,7 +84,6 @@ CREATE TABLE IF NOT EXISTS "Task" (
     CONSTRAINT "Task_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "Task_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-
 CREATE UNIQUE INDEX IF NOT EXISTS "Task_externalId_key" ON "Task"("externalId");
 CREATE INDEX IF NOT EXISTS "Task_userId_createdAt_idx" ON "Task"("userId", "createdAt");
 
@@ -58,7 +98,6 @@ CREATE TABLE IF NOT EXISTS "TaskUrl" (
     CONSTRAINT "TaskUrl_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "TaskUrl_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-
 CREATE INDEX IF NOT EXISTS "TaskUrl_taskId_idx" ON "TaskUrl"("taskId");
 
 CREATE TABLE IF NOT EXISTS "CreditTransaction" (
@@ -72,23 +111,4 @@ CREATE TABLE IF NOT EXISTS "CreditTransaction" (
     CONSTRAINT "CreditTransaction_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "CreditTransaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-
 CREATE INDEX IF NOT EXISTS "CreditTransaction_userId_createdAt_idx" ON "CreditTransaction"("userId", "createdAt");
-
-CREATE TABLE IF NOT EXISTS "PaymentEvent" (
-    "id" TEXT NOT NULL,
-    "externalId" TEXT NOT NULL,
-    "userId" TEXT,
-    "email" TEXT NOT NULL,
-    "amountUsd" DOUBLE PRECISION NOT NULL,
-    "creditsAdded" INTEGER NOT NULL,
-    "planId" TEXT,
-    "provider" TEXT NOT NULL DEFAULT 'buymeacoffee',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "PaymentEvent_pkey" PRIMARY KEY ("id"),
-    CONSTRAINT "PaymentEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE
-);
-
-CREATE UNIQUE INDEX IF NOT EXISTS "PaymentEvent_externalId_key" ON "PaymentEvent"("externalId");
-CREATE INDEX IF NOT EXISTS "PaymentEvent_email_createdAt_idx" ON "PaymentEvent"("email", "createdAt");
-CREATE INDEX IF NOT EXISTS "PaymentEvent_userId_createdAt_idx" ON "PaymentEvent"("userId", "createdAt");

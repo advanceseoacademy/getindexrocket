@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
+import { reconcileUserAccount } from "./reconcile-account";
 import { prisma } from "./prisma";
 
 const SESSION_COOKIE = "gir_session";
@@ -147,7 +148,14 @@ export async function createSession(userId: string) {
     where: { id: userId },
     select: USER_SELECT,
   });
-  if (user) await setUserCookie(user);
+  if (user) {
+    await reconcileUserAccount(user.id, user.email);
+    const refreshed = await prisma.user.findUnique({
+      where: { id: userId },
+      select: USER_SELECT,
+    });
+    if (refreshed) await setUserCookie(refreshed);
+  }
 }
 
 export async function destroySession() {

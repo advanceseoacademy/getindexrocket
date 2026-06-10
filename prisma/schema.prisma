@@ -31,9 +31,10 @@ model PaymentEvent {
   userId       String?
   user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   email        String
-  amountUsd    Float
-  creditsAdded Int
-  planId       String?
+  amountUsd        Float
+  creditsAdded     Int
+  intendedCredits  Int      @default(0)
+  planId           String?
   eventType    String?
   provider     String   @default("buymeacoffee")
   createdAt    DateTime @default(now())

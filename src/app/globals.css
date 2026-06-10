@@ -14,8 +14,20 @@
   --muted2: #5a6478;
   --amber: #f5a623;
   --radius: 12px;
-  --site-max-width: 1200px;
+  --site-width-min: 75rem; /* 1200px */
+  --site-width-max: 90rem; /* 1440px */
+  --site-max-width: 100%;
   --site-padding: max(5vw, 32px);
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --site-max-width: clamp(
+      var(--site-width-min),
+      92vw,
+      var(--site-width-max)
+    );
+  }
 }
 
 @theme inline {

@@ -46,6 +46,7 @@ async function handleCoffeePurchase(payload: BmcWebhookPayload, externalId: stri
       userId: user?.id ?? null,
       email,
       amountUsd,
+      intendedCredits: credits,
       creditsAdded: user ? credits : 0,
       planId: plan?.id ?? null,
       eventType: "coffee.purchase",

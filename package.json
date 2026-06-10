@@ -6,13 +6,21 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
+    "start:prod": "prisma migrate deploy && next start",
     "lint": "eslint",
-    "db:push": "prisma db push",
+    "db:backup": "node scripts/db-backup.mjs",
+    "db:restore": "node scripts/db-restore.mjs",
+    "db:seed": "node scripts/db-seed.mjs",
+    "db:push": "node scripts/safe-db-push.mjs",
+    "db:push:force": "prisma db push",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:baseline": "node scripts/db-baseline.mjs",
     "db:google-auth": "node scripts/apply-google-auth-migration.mjs",
     "check:google-auth": "node scripts/check-google-auth.mjs",
     "google:origins": "node scripts/configure-google-origins.mjs",
     "db:studio": "prisma studio",
-    "db:migrate:sqlite": "node scripts/migrate-sqlite-to-supabase.mjs"
+    "db:migrate:sqlite": "node scripts/migrate-sqlite-to-supabase.mjs",
+    "grant:credits": "node scripts/grant-credits.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
