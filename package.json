@@ -9,6 +9,7 @@
     "start:prod": "prisma migrate deploy && next start",
     "lint": "eslint",
     "db:backup": "node scripts/db-backup.mjs",
+    "db:audit": "node scripts/db-audit.mjs",
     "db:restore": "node scripts/db-restore.mjs",
     "db:seed": "node scripts/db-seed.mjs",
     "db:push": "node scripts/safe-db-push.mjs",
