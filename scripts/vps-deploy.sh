@@ -25,7 +25,16 @@ echo "--- Install dependencies ---"
 npm ci
 
 echo "--- Database migrations ---"
-npm run db:migrate:deploy
+if [[ "${SKIP_DB_MIGRATE:-}" == "1" ]]; then
+  echo "SKIP_DB_MIGRATE=1 — skipping migrations"
+else
+  npm run db:migrate:deploy || {
+    echo ""
+    echo "Migration failed. To continue without migrate:"
+    echo "  SKIP_DB_MIGRATE=1 bash scripts/vps-deploy.sh"
+    exit 1
+  }
+fi
 
 echo "--- Backup database ---"
 npm run db:backup || echo "WARN: backup failed (continuing)"
