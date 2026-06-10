@@ -197,6 +197,21 @@ export async function requireUser() {
   return { user, error: null, status: null };
 }
 
+export function isAdmin(user: SessionUser | null | undefined) {
+  return user?.role === "admin";
+}
+
+export async function requireAdmin() {
+  const auth = await requireUser();
+  if (!auth.user) {
+    return { error: auth.error, status: auth.status, user: null };
+  }
+  if (!isAdmin(auth.user)) {
+    return { error: "Forbidden" as const, status: 403 as const, user: null };
+  }
+  return { user: auth.user, error: null, status: null };
+}
+
 export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const hash = createHash("sha256")

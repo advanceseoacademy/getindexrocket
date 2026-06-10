@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RecentTaskCard } from "@/components/dashboard/RecentTaskCard";
-import { invalidateCache } from "@/lib/client-cache";
+import { invalidateCache, invalidateDashboardCache } from "@/lib/client-cache";
 import { navigateDashboard } from "@/lib/dashboard-nav";
 import type { SerializedTask } from "@/lib/tasks-serialize";
 import { filterTasksByTab, taskHasInProgress, type TaskTab } from "@/lib/task-ui";
@@ -50,7 +50,7 @@ export function DashboardRecentTasks({ tasks, onTasksChange }: DashboardRecentTa
       setRefreshingId(taskId);
       try {
         await fetch(`/api/tasks/${taskId}/refresh`, { method: "POST", credentials: "same-origin" });
-        invalidateCache("/api/dashboard");
+        invalidateDashboardCache();
         invalidateCache("/api/tasks");
         onTasksChange?.();
       } finally {

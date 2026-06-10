@@ -39,7 +39,7 @@ function ActionBtn({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(59,143,255,0.25)] bg-[rgba(59,143,255,0.1)] px-3 py-1.5 text-xs font-medium text-[var(--blue)] transition hover:bg-[rgba(59,143,255,0.18)] disabled:opacity-40"
+      className="inline-flex items-center gap-1.5 rounded-full border border-[var(--blue-25)] bg-[var(--blue-10)] px-3 py-1.5 text-xs font-medium text-[var(--blue)] transition hover:bg-[var(--blue-18)] disabled:opacity-40"
     >
       {icon}
       {label}
@@ -116,10 +116,10 @@ export function RecentTaskCard({
   const failedUrls = getFailedUrls(task);
   const headerStyle =
     rowStatus === "completed"
-      ? { color: "var(--green)", bg: "rgba(34,211,122,0.14)" }
+      ? { color: "var(--success)", bg: "var(--blue-14)" }
       : rowStatus === "failed"
         ? { color: "#f87171", bg: "rgba(248,113,113,0.14)" }
-        : { color: "var(--blue)", bg: "rgba(59,143,255,0.14)" };
+        : { color: "var(--blue)", bg: "var(--blue-14)" };
 
   function flash(msg: string) {
     setToast(msg);
@@ -147,7 +147,7 @@ export function RecentTaskCard({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[rgba(59,143,255,0.18)] bg-[rgba(59,143,255,0.06)]">
+    <div className="overflow-hidden rounded-2xl border border-[var(--blue-18)] bg-[var(--blue-06)]">
       <div className="flex items-start gap-2 p-4">
         <div className="mt-0.5 shrink-0 text-[var(--blue)]">{icons.pin}</div>
         <div className="min-w-0 flex-1">
@@ -199,7 +199,7 @@ export function RecentTaskCard({
       </div>
 
       {expanded && (
-        <div className="border-t border-[rgba(59,143,255,0.12)] px-4 pb-4">
+        <div className="border-t border-[var(--blue-12)] px-4 pb-4">
           <div className="mt-3 flex flex-wrap gap-2">
             <ActionBtn
               icon={icons.retry}
@@ -248,7 +248,7 @@ export function RecentTaskCard({
             })}
           </div>
 
-          {toast && <p className="mt-2 text-xs text-[var(--green)]">{toast}</p>}
+          {toast && <p className="mt-2 text-xs text-[var(--success)]">{toast}</p>}
         </div>
       )}
     </div>

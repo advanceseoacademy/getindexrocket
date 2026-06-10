@@ -1,18 +1,54 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0a0d12;
-  --bg2: #0f1318;
-  --bg3: #141920;
-  --bg4: #1a2130;
-  --card: rgba(255, 255, 255, 0.035);
-  --card-border: rgba(255, 255, 255, 0.07);
-  --green: #22d37a;
-  --blue: #3b8fff;
-  --text: #eef0f3;
-  --muted: #7a8499;
-  --muted2: #5a6478;
-  --amber: #f5a623;
+  /* Logo brand palette — IndexRocket rocket blue + orange */
+  --brand-blue: #1aa3ff;
+  --brand-orange: #ff9500;
+  --brand-orange-deep: #f37021;
+  --brand-cyan: #6ecfff;
+
+  /* Semantic tokens (legacy names kept for compatibility) */
+  --accent: var(--brand-orange);
+  --success: var(--brand-blue);
+  --green: var(--brand-orange);
+  --blue: var(--brand-blue);
+  --orange: var(--brand-orange-deep);
+  --cyan: var(--brand-cyan);
+  --on-accent: #1a0800;
+
+  /* Navy-tinted dark backgrounds (logo space theme) */
+  --bg: #050810;
+  --bg2: #0a1222;
+  --bg3: #0f1a2e;
+  --bg4: #152238;
+  --card: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text: #f0f4fa;
+  --muted: #8494ad;
+  --muted2: #5c6b82;
+  --amber: #ffb020;
+
+  /* Brand opacity helpers */
+  --accent-05: rgba(255, 149, 0, 0.05);
+  --accent-06: rgba(255, 149, 0, 0.06);
+  --accent-08: rgba(255, 149, 0, 0.08);
+  --accent-12: rgba(255, 149, 0, 0.12);
+  --accent-15: rgba(255, 149, 0, 0.15);
+  --accent-20: rgba(255, 149, 0, 0.2);
+  --accent-22: rgba(255, 149, 0, 0.22);
+  --accent-25: rgba(255, 149, 0, 0.25);
+  --accent-28: rgba(255, 149, 0, 0.28);
+  --blue-06: rgba(26, 163, 255, 0.06);
+  --blue-08: rgba(26, 163, 255, 0.08);
+  --blue-10: rgba(26, 163, 255, 0.1);
+  --blue-12: rgba(26, 163, 255, 0.12);
+  --blue-14: rgba(26, 163, 255, 0.14);
+  --blue-15: rgba(26, 163, 255, 0.15);
+  --blue-18: rgba(26, 163, 255, 0.18);
+  --blue-22: rgba(26, 163, 255, 0.22);
+  --blue-25: rgba(26, 163, 255, 0.25);
+  --blue-30: rgba(26, 163, 255, 0.3);
+
   --radius: 12px;
   --site-width-min: 75rem; /* 1200px */
   --site-width-max: 90rem; /* 1440px */
@@ -39,10 +75,14 @@
   --color-card-border: var(--card-border);
   --color-green: var(--green);
   --color-blue: var(--blue);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-cyan: var(--cyan);
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-muted2: var(--muted2);
   --color-amber: var(--amber);
+  --color-orange: var(--orange);
 }
 
 html {
@@ -66,7 +106,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--green), var(--blue));
+  background: linear-gradient(135deg, var(--brand-blue), var(--brand-orange));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -74,6 +114,186 @@ body {
 
 .live-dot {
   animation: pulse 2s ease-in-out infinite;
+}
+
+/* ── Scroll reveal ── */
+.reveal {
+  will-change: opacity, transform;
+}
+
+.reveal-fade-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-fade-in {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.reveal-slide-right {
+  opacity: 0;
+  transform: translateX(32px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-slide-left {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-visible.reveal-fade-up,
+.reveal-visible.reveal-slide-right,
+.reveal-visible.reveal-slide-left,
+.reveal-visible.reveal-scale {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-visible.reveal-fade-in {
+  opacity: 1;
+}
+
+/* ── Hero load animations ── */
+.animate-hero-in {
+  animation: hero-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-hero-in-delay-1 {
+  animation: hero-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.animate-hero-in-delay-2 {
+  animation: hero-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+.animate-hero-in-delay-3 {
+  animation: hero-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
+}
+
+.animate-float {
+  animation: float-y 5s ease-in-out infinite;
+}
+
+.animate-nav-in {
+  animation: nav-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-page-in {
+  animation: fade-in 0.45s ease both;
+}
+
+/* ── Interactive cards & buttons ── */
+.hover-lift {
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    background-color 0.28s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-25);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    filter 0.22s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px var(--accent-28);
+  filter: brightness(1.05);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-ghost {
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    color 0.22s ease,
+    background-color 0.22s ease;
+}
+
+.btn-ghost:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.nav-link {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--brand-orange), var(--brand-blue));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+.pipeline-row {
+  animation: pipeline-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+details.faq-item {
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+details.faq-item[open] {
+  border-color: var(--blue-22);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+details.faq-item summary {
+  transition: color 0.2s ease;
+}
+
+details.faq-item[open] summary {
+  color: var(--text);
+}
+
+.stat-pop {
+  animation: stat-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .section-below-fold {
@@ -88,5 +308,98 @@ body {
   }
   50% {
     opacity: 0.4;
+  }
+}
+
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pipeline-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes stat-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-fade-up,
+  .reveal-fade-in,
+  .reveal-slide-right,
+  .reveal-slide-left,
+  .reveal-scale {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .animate-hero-in,
+  .animate-hero-in-delay-1,
+  .animate-hero-in-delay-2,
+  .animate-hero-in-delay-3,
+  .animate-float,
+  .animate-nav-in,
+  .animate-page-in,
+  .pipeline-row,
+  .stat-pop {
+    animation: none;
+  }
+
+  .hover-lift:hover,
+  .btn-primary:hover,
+  .btn-ghost:hover {
+    transform: none;
   }
 }

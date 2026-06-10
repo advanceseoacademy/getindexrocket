@@ -13,6 +13,8 @@ export async function GET() {
       email: auth.user.email,
       name: auth.user.name,
       creditBalance: auth.user.creditBalance,
+      role: auth.user.role,
+      isAdmin: auth.user.role === "admin",
     },
   });
 }

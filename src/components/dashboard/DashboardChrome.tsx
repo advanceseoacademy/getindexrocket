@@ -69,7 +69,7 @@ export function DashboardChrome() {
     setActivePath(href);
     setMounted((prev) => new Set(prev).add(href));
     navigateDashboard(href);
-    if (href === "/dashboard") prefetch("/api/dashboard");
+    if (href === "/dashboard") prefetch("/api/dashboard?skipSync=1");
     if (href === "/tasks") prefetch("/api/tasks?skipSync=1");
   }, []);
 
@@ -100,7 +100,7 @@ export function DashboardChrome() {
   }, []);
 
   useEffect(() => {
-    prefetch("/api/dashboard");
+    prefetch("/api/dashboard?skipSync=1");
     prefetch("/api/tasks?skipSync=1");
   }, []);
 
@@ -126,7 +126,7 @@ export function DashboardChrome() {
       <Nav user={user} />
       <main
         id="main-content"
-        className="site-container flex-1 py-10"
+        className="site-container flex-1 py-10 animate-page-in"
       >
         <DashboardNav activePath={activePath} onNavigate={navigateInstant} />
         {Array.from(mounted).map((path) => {

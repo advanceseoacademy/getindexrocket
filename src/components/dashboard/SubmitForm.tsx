@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CREDIT_PER_URL } from "@/lib/brand";
-import { invalidateCache } from "@/lib/client-cache";
+import { invalidateCache, invalidateDashboardCache } from "@/lib/client-cache";
 
 type SubmitFormProps = {
   creditBalance: number;
@@ -47,7 +47,7 @@ export function SubmitForm({ creditBalance: initialBalance }: SubmitFormProps) {
       setUrls("");
       if (typeof data.creditBalance === "number") {
         setCreditBalance(data.creditBalance);
-        invalidateCache("/api/dashboard");
+        invalidateDashboardCache();
         invalidateCache("/api/account");
         invalidateCache("/api/tasks");
       }
@@ -74,7 +74,7 @@ export function SubmitForm({ creditBalance: initialBalance }: SubmitFormProps) {
           rows={10}
           required
           placeholder={"https://example.com/guest-post\nhttps://example.com/backlink"}
-          className="w-full rounded-[10px] border border-[var(--card-border)] bg-[var(--bg2)] px-4 py-3 font-mono text-sm text-[var(--text)] outline-none focus:border-[var(--green)]"
+          className="w-full rounded-[10px] border border-[var(--card-border)] bg-[var(--bg2)] px-4 py-3 font-mono text-sm text-[var(--text)] outline-none focus:border-[var(--blue)]"
         />
       </div>
 
@@ -87,12 +87,12 @@ export function SubmitForm({ creditBalance: initialBalance }: SubmitFormProps) {
       </div>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
-      {success && <p className="text-sm text-[var(--green)]">{success}</p>}
+      {success && <p className="text-sm text-[var(--success)]">{success}</p>}
 
       <button
         type="submit"
         disabled={loading || urlCount === 0 || cost > creditBalance}
-        className="w-full rounded-[10px] bg-[var(--green)] py-3.5 font-semibold text-[#050f08] disabled:opacity-50"
+        className="w-full rounded-[10px] bg-[var(--green)] py-3.5 font-semibold text-[var(--on-accent)] disabled:opacity-50"
       >
         {loading ? "Submitting..." : "Submit URLs"}
       </button>

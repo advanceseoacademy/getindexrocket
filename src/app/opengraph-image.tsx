@@ -17,15 +17,15 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: 64,
-          background: "linear-gradient(135deg, #0a0d12 0%, #141920 100%)",
-          color: "#eef0f3",
+          background: "linear-gradient(135deg, #050810 0%, #0f1a2e 100%)",
+          color: "#f0f4fa",
         }}
       >
-        <div style={{ fontSize: 28, color: "#ff8c42", marginBottom: 16 }}>{APP_NAME}</div>
+        <div style={{ fontSize: 28, color: "#ff9500", marginBottom: 16 }}>{APP_NAME}</div>
         <div style={{ fontSize: 56, fontWeight: 700, lineHeight: 1.15, maxWidth: 900 }}>
           Backlink Indexing for SEO Teams
         </div>
-        <div style={{ fontSize: 28, color: "#7a8499", marginTop: 24, maxWidth: 800 }}>
+        <div style={{ fontSize: 28, color: "#6ecfff", marginTop: 24, maxWidth: 800 }}>
           {APP_TAGLINE} · 1 credit = 1 URL · Live tracking
         </div>
       </div>

@@ -17,10 +17,10 @@ export function Footer() {
           <div>
             <p className="text-sm font-semibold">Product</p>
             <nav className="mt-3 flex flex-col gap-2 text-sm text-[var(--muted)]" aria-label="Product">
-              <Link href="/#features" className="no-underline hover:text-[var(--text)]">
+              <Link href="/features" className="no-underline hover:text-[var(--text)]">
                 Features
               </Link>
-              <Link href="/#how" className="no-underline hover:text-[var(--text)]">
+              <Link href="/how-it-works" className="no-underline hover:text-[var(--text)]">
                 How it works
               </Link>
               <Link href="/pricing" className="no-underline hover:text-[var(--text)]">
@@ -45,6 +45,9 @@ export function Footer() {
               </Link>
               <Link href="/terms" className="no-underline hover:text-[var(--text)]">
                 Terms of Service
+              </Link>
+              <Link href="/refund-policy" className="no-underline hover:text-[var(--text)]">
+                Refund Policy
               </Link>
             </nav>
           </div>

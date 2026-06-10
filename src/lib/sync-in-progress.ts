@@ -18,13 +18,17 @@ export async function syncInProgressTasks(userId: string, limit = 20) {
 
   let synced = 0;
   const errors: string[] = [];
+  const batch = needsSync.slice(0, limit);
+  const concurrency = 3;
 
-  for (const task of needsSync.slice(0, limit)) {
-    try {
-      await syncTaskFromProvider(task.id, userId);
-      synced++;
-    } catch (err) {
-      errors.push(err instanceof Error ? err.message : "Sync failed");
+  for (let i = 0; i < batch.length; i += concurrency) {
+    const chunk = batch.slice(i, i + concurrency);
+    const results = await Promise.allSettled(
+      chunk.map((task) => syncTaskFromProvider(task.id, userId)),
+    );
+    for (const result of results) {
+      if (result.status === "fulfilled") synced++;
+      else errors.push(result.reason instanceof Error ? result.reason.message : "Sync failed");
     }
   }
 

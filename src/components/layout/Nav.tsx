@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
-import { NavAuthClient } from "@/components/layout/NavAuthClient";
+import { NavGuestActions } from "@/components/layout/NavGuestActions";
 import { NavLoggedInActions } from "@/components/layout/NavLoggedInActions";
 
 type NavUser = {
@@ -12,23 +12,26 @@ type NavProps = {
   user?: NavUser | null;
 };
 
-export function Nav({ user }: NavProps) {
+export function Nav({ user = null }: NavProps) {
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--card-border)] bg-[rgba(10,13,18,0.92)]">
+    <header className="sticky top-0 z-50 border-b border-[var(--card-border)] bg-[rgba(10,13,18,0.85)] backdrop-blur-md">
       <div className="site-container flex items-center justify-between py-4">
         <Logo variant="nav" />
 
         <nav
-          className="hidden items-center gap-6 text-sm text-[var(--muted)] md:flex"
+          className="hidden items-center gap-6 text-base text-[var(--muted)] md:flex"
           aria-label="Main navigation"
         >
-          <Link href="/#features" className="no-underline hover:text-[var(--text)]">
+          <Link href="/" className="nav-link no-underline hover:text-[var(--text)]">
+            Home
+          </Link>
+          <Link href="/features" className="nav-link no-underline hover:text-[var(--text)]">
             Features
           </Link>
-          <Link href="/#how" className="no-underline hover:text-[var(--text)]">
+          <Link href="/how-it-works" className="nav-link no-underline hover:text-[var(--text)]">
             How it works
           </Link>
-          <Link href="/pricing" className="no-underline hover:text-[var(--text)]">
+          <Link href="/pricing" className="nav-link no-underline hover:text-[var(--text)]">
             Pricing
           </Link>
         </nav>
@@ -36,7 +39,7 @@ export function Nav({ user }: NavProps) {
         {user ? (
           <NavLoggedInActions creditBalance={user.creditBalance} />
         ) : (
-          <NavAuthClient />
+          <NavGuestActions />
         )}
       </div>
     </header>

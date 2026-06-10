@@ -4,11 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { DashboardRecentTasks } from "@/components/dashboard/DashboardRecentTasks";
 import { DashboardSubmitPanel } from "@/components/dashboard/DashboardSubmitPanel";
 import { DashboardUsageChart } from "@/components/dashboard/DashboardUsageChart";
-import { invalidateCache } from "@/lib/client-cache";
+import { invalidateDashboardCache } from "@/lib/client-cache";
 import { navigateDashboard } from "@/lib/dashboard-nav";
 import type { SerializedTask } from "@/lib/tasks-serialize";
 
 const LOW_BALANCE_THRESHOLD = 15;
+const DASHBOARD_FAST = "/api/dashboard?skipSync=1";
 
 type DashboardStats = {
   creditBalance: number;
@@ -33,14 +34,19 @@ function StatCard({
   value,
   icon,
   accent,
+  delay = 0,
 }: {
   label: string;
   value: string;
   icon: React.ReactNode;
   accent?: string;
+  delay?: number;
 }) {
   return (
-    <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5">
+    <div
+      className="hover-lift stat-pop rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5"
+      style={{ animationDelay: `${delay}ms` }}
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs text-[var(--muted)]">{label}</p>
@@ -48,7 +54,7 @@ function StatCard({
             {value}
           </p>
         </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[rgba(59,143,255,0.12)] text-lg">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--blue-12)] text-lg">
           {icon}
         </div>
       </div>
@@ -82,30 +88,58 @@ function OverviewSkeleton() {
   );
 }
 
+async function fetchDashboard() {
+  const res = await fetch(DASHBOARD_FAST, { credentials: "same-origin", cache: "no-store" });
+  if (!res.ok) return null;
+  const json = await res.json();
+  return json?.user ? (json as DashboardData) : null;
+}
+
 export function DashboardHome() {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [syncing, setSyncing] = useState(false);
 
-  const load = useCallback(() => {
-    invalidateCache("/api/dashboard");
-    fetch("/api/dashboard", { credentials: "same-origin", cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => {
-        if (json?.user) setData(json);
-      })
-      .catch(() => {});
+  const load = useCallback(async () => {
+    invalidateDashboardCache();
+    const json = await fetchDashboard();
+    if (json) setData(json);
+    return json;
   }, []);
 
   useEffect(() => {
-    load();
+    let cancelled = false;
+
+    fetchDashboard().then((json) => {
+      if (!cancelled && json) setData(json);
+    });
+
+    setSyncing(true);
+    fetch("/api/tasks/refresh-all", { method: "POST", credentials: "same-origin" })
+      .then(() => fetchDashboard())
+      .then((json) => {
+        if (!cancelled && json) setData(json);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setSyncing(false);
+      });
+
     const interval = setInterval(() => {
-      if (document.visibilityState === "visible") load();
+      if (document.visibilityState === "visible") {
+        fetchDashboard().then((json) => {
+          if (!cancelled && json) setData(json);
+        });
+      }
     }, 30_000);
-    return () => clearInterval(interval);
-  }, [load]);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleSubmitted = useCallback(() => {
-    invalidateCache("/api/dashboard");
-    load();
+    void load();
   }, [load]);
 
   if (!data) return <OverviewSkeleton />;
@@ -114,13 +148,14 @@ export function DashboardHome() {
   const lowBalance = stats.creditBalance < LOW_BALANCE_THRESHOLD;
 
   return (
-    <div className="space-y-6">
+    <div className="animate-page-in space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold md:text-3xl">Dashboard</h1>
           <p className="mt-1 text-sm text-[var(--muted)]">
             Welcome to your indexing control center
             {user.name ? `, ${user.name}` : ""}.
+            {syncing ? " Updating task status…" : ""}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -139,18 +174,15 @@ export function DashboardHome() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Balance" value={`${stats.creditBalance} credits`} icon="🎫" />
-        <StatCard label="Results lost" value={String(stats.disappeared)} icon="🚀" />
-        <StatCard
-          label="Total submitted"
-          value={String(stats.totalSubmitted)}
-          icon="📋"
-        />
+        <StatCard label="Balance" value={`${stats.creditBalance} credits`} icon="🎫" delay={0} />
+        <StatCard label="Not crawled" value={String(stats.disappeared)} icon="🚀" delay={80} />
+        <StatCard label="Total submitted" value={String(stats.totalSubmitted)} icon="📋" delay={160} />
         <StatCard
           label="Success rate"
           value={`${stats.successRate}%`}
           icon="✓"
-          accent="var(--green)"
+          accent="var(--success)"
+          delay={240}
         />
       </div>
 

@@ -123,7 +123,7 @@ export function TaskDetailModal({
 
         <div className="grid grid-cols-2 gap-3 px-6 py-4 sm:grid-cols-4">
           <StatCard label="Total links" value={stats.total} color="var(--text)" />
-          <StatCard label="Crawled" value={stats.crawled} color="var(--green)" />
+          <StatCard label="Crawled" value={stats.crawled} color="var(--success)" />
           <StatCard label="Failed" value={stats.failed} color="var(--amber)" />
           <StatCard label="Pending" value={stats.pending} color="var(--muted)" />
         </div>

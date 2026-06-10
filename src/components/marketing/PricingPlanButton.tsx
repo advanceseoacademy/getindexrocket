@@ -20,7 +20,7 @@ export function PricingPlanButton({ planId, label }: PricingPlanButtonProps) {
   return (
     <Link
       href={href}
-      className="mt-6 inline-flex w-full justify-center rounded-[10px] bg-[var(--green)] py-3 font-semibold text-[#050f08] no-underline"
+      className="mt-6 inline-flex w-full justify-center rounded-[10px] bg-[var(--green)] py-3 font-semibold text-[var(--on-accent)] no-underline"
     >
       {label}
     </Link>

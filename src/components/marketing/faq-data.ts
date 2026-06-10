@@ -7,7 +7,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "How much does each URL cost?",
-    a: "1 credit = 1 URL submission. Duplicate URLs within 30 days are free. Buy credit packs via membership or top-up.",
+    a: "1 credit = 1 URL submission. Buy credit packs via Buy Me a Coffee membership or top-up. Credits stay on your account while it is active.",
   },
   {
     q: "Can I index URLs on sites I don't own?",
@@ -15,22 +15,22 @@ export const FAQ_ITEMS = [
   },
   {
     q: `Does ${APP_NAME} guarantee Google indexing?`,
-    a: "No legitimate service can guarantee indexing. We send real discovery signals and show honest pipeline status: Submitted, Discovered, Indexed, or Refunded.",
+    a: "No legitimate service can guarantee indexing. We send real discovery signals and show honest pipeline status: Submitted, Processing, Crawled, or Refunded.",
   },
   {
-    q: "What happens if a URL fails to crawl?",
-    a: "If crawl verification fails within the tier window, your credit is automatically refunded to your account.",
+    q: "What happens if a backlink fails to get crawled?",
+    a: "If crawl verification fails, the URL is marked Refunded in your dashboard and 1 credit is automatically returned to your account. See our Refund Policy for full details.",
   },
   {
     q: "Can I submit URLs in bulk?",
-    a: "Yes. Paste multiple URLs, upload CSV files, or use our REST API for high-volume campaigns.",
+    a: "Yes. Paste multiple URLs (one per line) from your dashboard or submit page. Up to 10,000 URLs per batch.",
   },
   {
     q: "How do I pay for credits?",
-    a: "Purchase monthly membership via Buy Me a Coffee — Starter ($10), Pro ($20), or Agency ($50). Credits never expire.",
+    a: "Purchase monthly membership via Buy Me a Coffee — Starter ($10), Pro ($20), or Agency ($50). Credits remain on your account while it is active.",
   },
   {
     q: "How do I track my submissions?",
-    a: "Open the Tracking dashboard to see live status for every URL. Refresh anytime to pull the latest status update.",
+    a: "Open My Tasks in your dashboard to see live status for every URL. Refresh anytime to pull the latest update from the indexing pipeline.",
   },
 ];

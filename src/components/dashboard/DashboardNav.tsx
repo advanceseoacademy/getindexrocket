@@ -4,7 +4,7 @@ import type { DashboardPath } from "@/lib/dashboard-nav";
 import { prefetch } from "@/lib/client-cache";
 
 const LINKS = [
-  { href: "/dashboard", label: "Overview", prefetch: "/api/dashboard" },
+  { href: "/dashboard", label: "Overview", prefetch: "/api/dashboard?skipSync=1" },
   { href: "/submit", label: "Submit URLs", prefetch: null },
   { href: "/tasks", label: "My Tasks", prefetch: "/api/tasks" },
   { href: "/billing", label: "Buy Credits", prefetch: null },
@@ -36,7 +36,7 @@ export function DashboardNav({ activePath, onNavigate }: DashboardNavProps) {
             onClick={() => onNavigate(link.href)}
             className={`rounded-lg px-4 py-2 text-sm ${
               activePath === link.href
-                ? "bg-[var(--green)] font-medium text-[#050f08]"
+                ? "bg-[var(--accent)] font-medium text-[var(--on-accent)]"
                 : "text-[var(--muted)] hover:text-[var(--text)]"
             }`}
           >

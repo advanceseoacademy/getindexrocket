@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CREDIT_PER_URL } from "@/lib/brand";
-import { invalidateCache } from "@/lib/client-cache";
+import { invalidateCache, invalidateDashboardCache } from "@/lib/client-cache";
 
 type DashboardSubmitPanelProps = {
   creditBalance: number;
@@ -54,7 +54,7 @@ export function DashboardSubmitPanel({
       if (typeof data.creditBalance === "number") {
         setCreditBalance(data.creditBalance);
       }
-      invalidateCache("/api/dashboard");
+      invalidateDashboardCache();
       invalidateCache("/api/account");
       invalidateCache("/api/tasks");
       onSubmitted?.();
@@ -126,7 +126,7 @@ export function DashboardSubmitPanel({
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-xl border-2 border-[var(--blue)] bg-[rgba(59,143,255,0.08)] p-4">
+        <div className="rounded-xl border-2 border-[var(--blue)] bg-[var(--blue-08)] p-4">
           <div className="flex items-start gap-3">
             <span className="text-xl" aria-hidden>
               🐢
@@ -183,7 +183,7 @@ export function DashboardSubmitPanel({
       </div>
 
       {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
-      {success && <p className="mt-3 text-sm text-[var(--green)]">{success}</p>}
+      {success && <p className="mt-3 text-sm text-[var(--success)]">{success}</p>}
 
       <button
         type="submit"

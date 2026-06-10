@@ -1,4 +1,5 @@
-import { normalizeApiStatus } from "@/lib/indexing-status";
+import { normalizeApiStatus, statusBucket } from "@/lib/indexing-status";
+import { refundUrlIfEligible } from "@/lib/credits";
 import { getTaskStatus } from "@/lib/indexnowfast";
 import { prisma } from "@/lib/prisma";
 
@@ -24,6 +25,7 @@ export async function syncTaskFromProvider(taskId: string, userId: string) {
 
   const remote = await getTaskStatus(task.externalId);
   const urlMap = new Map(task.urls.map((u) => [normalizeUrl(u.url), u]));
+  const pendingRefunds: { taskUrlId: string; url: string }[] = [];
 
   await prisma.$transaction(async (tx) => {
     const providerRef = remote.task.provider_task_id
@@ -49,15 +51,28 @@ export async function syncTaskFromProvider(taskId: string, userId: string) {
         );
       }
       if (!local) continue;
+
+      const newStatus = normalizeApiStatus(remoteUrl.status);
+      const wasRefunded = statusBucket(local.status) === "refunded";
+      const isRefunded = statusBucket(newStatus) === "refunded";
+
+      if (isRefunded && !wasRefunded) {
+        pendingRefunds.push({ taskUrlId: local.id, url: local.url });
+      }
+
       await tx.taskUrl.update({
         where: { id: local.id },
         data: {
-          status: normalizeApiStatus(remoteUrl.status),
+          status: newStatus,
           indexedAt: remoteUrl.indexed_at ? new Date(remoteUrl.indexed_at) : null,
         },
       });
     }
   });
+
+  for (const item of pendingRefunds) {
+    await refundUrlIfEligible(userId, item.taskUrlId, item.url);
+  }
 
   return prisma.task.findUnique({
     where: { id: task.id },

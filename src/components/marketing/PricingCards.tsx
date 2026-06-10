@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BMC_MEMBERSHIP_URL } from "@/lib/brand";
 import { PricingPlanButton } from "@/components/marketing/PricingPlanButton";
+import { AnimateIn } from "@/components/ui/AnimateIn";
 import { CREDIT_PLANS } from "@/lib/pricing-plans";
 
 function FeatureIcon({ text }: { text: string }) {
@@ -13,28 +14,35 @@ function FeatureIcon({ text }: { text: string }) {
 export function PricingCards() {
   return (
     <div className="space-y-16">
-      <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--bg2)] p-6 text-center">
-        <p className="text-lg font-semibold">1 credit = 1 URL submitted</p>
-        <p className="mt-2 text-sm text-[var(--muted)]">
-          Duplicate URLs are free. Credits never expire. Auto refund if crawl fails.
-        </p>
-      </div>
+      <AnimateIn variant="scale">
+        <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--bg2)] p-6 text-center">
+          <p className="text-lg font-semibold">1 credit = 1 URL submitted</p>
+          <p className="mt-2 text-sm text-[var(--muted)]">
+            1 credit per URL. Auto credit refund if crawl fails.{" "}
+            <Link href="/refund-policy" className="text-[var(--green)] no-underline hover:underline">
+              Refund policy
+            </Link>
+          </p>
+        </div>
+      </AnimateIn>
 
       <div>
-        <h2 className="text-2xl font-bold">Membership Plans</h2>
-        <p className="mt-2 text-[var(--muted)]">
-          Monthly membership via Buy Me a Coffee — cancel anytime.
-        </p>
+        <AnimateIn>
+          <h2 className="text-2xl font-bold">Membership Plans</h2>
+          <p className="mt-2 text-[var(--muted)]">
+            Monthly membership via Buy Me a Coffee — cancel anytime.
+          </p>
+        </AnimateIn>
         <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {CREDIT_PLANS.map((plan) => (
-            <div
-              key={plan.id}
-              className={`flex flex-col rounded-2xl border p-6 ${
-                plan.highlight
-                  ? "border-[var(--green)] bg-[rgba(34,211,122,0.05)]"
-                  : "border-[var(--card-border)] bg-[var(--card)]"
-              }`}
-            >
+          {CREDIT_PLANS.map((plan, i) => (
+            <AnimateIn key={plan.id} delay={i * 80}>
+              <div
+                className={`hover-lift flex h-full flex-col rounded-2xl border p-6 ${
+                  plan.highlight
+                    ? "border-[var(--green)] bg-[var(--accent-05)]"
+                    : "border-[var(--card-border)] bg-[var(--card)]"
+                }`}
+              >
               {plan.badge && (
                 <span className="text-xs font-medium text-[var(--green)]">{plan.badge}</span>
               )}
@@ -69,7 +77,8 @@ export function PricingCards() {
               ) : (
                 <PricingPlanButton planId={plan.id} label="Join membership" />
               )}
-            </div>
+              </div>
+            </AnimateIn>
           ))}
         </div>
         <p className="mt-6 text-sm text-[var(--muted)]">

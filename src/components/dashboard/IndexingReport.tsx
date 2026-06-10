@@ -322,9 +322,9 @@ export function IndexingReport() {
                               style={{
                                 width: `${progress.percent}%`,
                                 background: isComplete
-                                  ? "var(--green)"
+                                  ? "var(--success)"
                                   : processing
-                                    ? "linear-gradient(90deg, var(--blue), var(--green))"
+                                    ? "linear-gradient(90deg, var(--blue), var(--accent))"
                                     : "var(--blue)",
                               }}
                             />

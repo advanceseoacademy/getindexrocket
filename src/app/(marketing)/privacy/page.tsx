@@ -1,5 +1,4 @@
-import { Footer } from "@/components/layout/Footer";
-import { BreadcrumbJsonLd } from "@/components/marketing/JsonLd";
+import { BreadcrumbJsonLd } from "@/components/marketing/BreadcrumbJsonLd";
 import { APP_NAME } from "@/lib/brand";
 import { buildPageMetadata } from "@/lib/seo-metadata";
 
@@ -63,7 +62,6 @@ export default function PrivacyPage() {
           </p>
         </section>
       </article>
-      <Footer />
     </>
   );
 }

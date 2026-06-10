@@ -23,3 +23,8 @@ export function invalidateCache(url?: string) {
   if (url) store.delete(url);
   else store.clear();
 }
+
+export function invalidateDashboardCache() {
+  store.delete("/api/dashboard");
+  store.delete("/api/dashboard?skipSync=1");
+}

@@ -11,11 +11,13 @@ export type PublicRoute = {
 /** Public marketing pages in sitemap.xml */
 export const PUBLIC_SITEMAP_ROUTES: PublicRoute[] = [
   { path: "/", changeFrequency: "weekly", priority: 1 },
+  { path: "/features", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/how-it-works", changeFrequency: "monthly", priority: 0.85 },
   { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
   { path: "/register", changeFrequency: "monthly", priority: 0.8 },
-  { path: "/login", changeFrequency: "monthly", priority: 0.4 },
   { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
   { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/refund-policy", changeFrequency: "yearly", priority: 0.4 },
 ];
 
 /** Block private app & API routes from crawlers */
@@ -26,4 +28,6 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/tasks",
   "/billing",
   "/settings",
+  "/admin",
+  "/admin/login",
 ];

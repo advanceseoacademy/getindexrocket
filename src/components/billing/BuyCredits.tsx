@@ -56,7 +56,7 @@ export function BuyCredits({ userEmail, creditBalance }: BuyCreditsProps) {
               key={plan.id}
               className={`rounded-2xl border p-6 ${
                 isSelected || plan.highlight
-                  ? "border-[var(--green)] bg-[rgba(34,211,122,0.05)]"
+                  ? "border-[var(--green)] bg-[var(--accent-05)]"
                   : "border-[var(--card-border)] bg-[var(--card)]"
               }`}
             >
@@ -108,7 +108,7 @@ export function BuyCredits({ userEmail, creditBalance }: BuyCreditsProps) {
                   href={paymentUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-6 inline-flex w-full justify-center rounded-[10px] bg-[var(--green)] py-3 font-semibold text-[#050f08] no-underline"
+                  className="mt-6 inline-flex w-full justify-center rounded-[10px] bg-[var(--green)] py-3 font-semibold text-[var(--on-accent)] no-underline"
                 >
                   Join {plan.name} — ${plan.priceUsd}/mo →
                 </a>
@@ -116,7 +116,7 @@ export function BuyCredits({ userEmail, creditBalance }: BuyCreditsProps) {
                 <button
                   type="button"
                   disabled
-                  className="mt-6 w-full rounded-[10px] bg-[var(--green)] py-3 font-semibold text-[#050f08] opacity-50"
+                  className="mt-6 w-full rounded-[10px] bg-[var(--green)] py-3 font-semibold text-[var(--on-accent)] opacity-50"
                 >
                   Payment unavailable
                 </button>

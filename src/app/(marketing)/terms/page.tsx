@@ -1,5 +1,4 @@
-import { Footer } from "@/components/layout/Footer";
-import { BreadcrumbJsonLd } from "@/components/marketing/JsonLd";
+import { BreadcrumbJsonLd } from "@/components/marketing/BreadcrumbJsonLd";
 import { APP_NAME } from "@/lib/brand";
 import { buildPageMetadata } from "@/lib/seo-metadata";
 
@@ -36,8 +35,12 @@ export default function TermsPage() {
           <h2 className="text-lg font-semibold text-[var(--text)]">Credits & billing</h2>
           <p>
             1 credit equals 1 URL submission. Credits are purchased via Buy Me a Coffee membership
-            or top-up. Credits do not expire while your account is active. Refunds are issued
-            automatically when crawl verification fails per our refund policy.
+            or top-up. Credits remain on your account while it is active. If crawl verification fails,
+            credits are automatically refunded per our{" "}
+            <a href="/refund-policy" className="text-[var(--green)]">
+              refund policy
+            </a>
+            .
           </p>
 
           <h2 className="text-lg font-semibold text-[var(--text)]">Acceptable use</h2>
@@ -63,7 +66,6 @@ export default function TermsPage() {
           </p>
         </section>
       </article>
-      <Footer />
     </>
   );
 }

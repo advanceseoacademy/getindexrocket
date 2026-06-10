@@ -6,17 +6,21 @@ import { prisma } from "@/lib/prisma";
 import { syncInProgressTasks } from "@/lib/sync-in-progress";
 import { serializeTask } from "@/lib/tasks-serialize";
 
-export async function GET() {
+export async function GET(request: Request) {
   const auth = await requireUser();
   if (!auth.user) {
     return NextResponse.json({ error: auth.error }, { status: auth.status! });
   }
 
+  const skipSync = new URL(request.url).searchParams.get("skipSync") === "1";
+
   const since = new Date();
   since.setDate(since.getDate() - 13);
   since.setHours(0, 0, 0, 0);
 
-  await syncInProgressTasks(auth.user.id);
+  if (!skipSync) {
+    await syncInProgressTasks(auth.user.id);
+  }
 
   const [tasks, spendingRows] = await Promise.all([
     prisma.task.findMany({

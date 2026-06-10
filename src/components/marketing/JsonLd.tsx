@@ -1,6 +1,9 @@
 import { FAQ_ITEMS } from "@/components/marketing/faq-data";
-import { APP_NAME, APP_TAGLINE, APP_URL } from "@/lib/brand";
+import { APP_NAME, APP_URL } from "@/lib/brand";
 import { CREDIT_PLANS } from "@/lib/pricing-plans";
+
+export { BreadcrumbJsonLd } from "./BreadcrumbJsonLd";
+export { LegalPageJsonLd } from "./LegalPageJsonLd";
 
 export function HomeJsonLd() {
   const organization = {
@@ -9,7 +12,14 @@ export function HomeJsonLd() {
     name: APP_NAME,
     url: APP_URL,
     logo: `${APP_URL}/logo.png`,
-    description: APP_TAGLINE,
+    description:
+      "Backlink indexing platform for guest posts, niche edits, and third-party URLs. 1 credit per URL with automatic credit refund on crawl failure.",
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "support@getindexrocket.com",
+      availableLanguage: "English",
+    },
   };
 
   const website = {
@@ -107,22 +117,3 @@ export function PricingJsonLd() {
   );
 }
 
-export function BreadcrumbJsonLd({ items }: { items: { name: string; path: string }[] }) {
-  const data = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: items.map((item, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      name: item.name,
-      item: `${APP_URL}${item.path === "/" ? "" : item.path}`,
-    })),
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
-  );
-}

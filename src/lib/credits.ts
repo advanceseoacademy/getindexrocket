@@ -74,3 +74,24 @@ export async function refundCredits(
 ) {
   return addCredits(userId, amount, "refund", description);
 }
+
+/** Idempotent per-taskUrl refund when provider marks a URL as refunded. */
+export async function refundUrlIfEligible(
+  userId: string,
+  taskUrlId: string,
+  url: string,
+) {
+  const marker = `taskUrl:${taskUrlId}`;
+  const existing = await prisma.creditTransaction.findFirst({
+    where: { userId, type: "refund", description: { contains: marker } },
+    select: { id: true },
+  });
+  if (existing) return false;
+
+  await refundCredits(
+    userId,
+    CREDIT_PER_URL,
+    `Crawl failed — credit returned (${marker}) ${url}`,
+  );
+  return true;
+}

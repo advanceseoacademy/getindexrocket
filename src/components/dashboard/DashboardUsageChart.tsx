@@ -22,7 +22,7 @@ export function DashboardUsageChart({ data }: DashboardUsageChartProps) {
     <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5">
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="text-sm font-semibold">Credits spent (last 14 days)</h2>
-        <span className="text-lg font-bold text-[var(--blue)]">{total}</span>
+        <span className="text-lg font-bold text-[var(--accent)]">{total}</span>
       </div>
 
       {total === 0 ? (
@@ -40,7 +40,7 @@ export function DashboardUsageChart({ data }: DashboardUsageChartProps) {
             return (
               <div key={point.date} className="group flex h-full flex-1 flex-col items-center justify-end gap-1">
                 <div
-                  className="w-full min-w-[4px] rounded-t bg-[var(--blue)] opacity-80 transition-all group-hover:opacity-100"
+                  className="w-full min-w-[4px] rounded-t bg-[var(--accent)] opacity-80 transition-all group-hover:opacity-100"
                   style={{ height: barHeight }}
                   title={`${formatDayLabel(point.date)}: ${point.credits} credits`}
                 />

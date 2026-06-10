@@ -3,7 +3,7 @@ import Link from "next/link";
 import { LOGO_ALT, LOGO_PATH } from "@/lib/brand";
 
 const SIZES = {
-  nav: { height: 44, width: 48 },
+  nav: { height: 64, width: 70 },
   footer: { height: 56, width: 62 },
   auth: { height: 72, width: 79 },
 } as const;

@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { AuthPanel } from "@/components/auth/AuthPanel";
-import { Footer } from "@/components/layout/Footer";
 import { Logo } from "@/components/layout/Logo";
 import { BreadcrumbJsonLd } from "@/components/marketing/JsonLd";
 import { APP_NAME } from "@/lib/brand";
@@ -26,18 +25,17 @@ export default function RegisterPage() {
         ]}
       />
       <section className="site-container py-16">
-        <div className="mb-8 flex justify-center">
+        <div className="mb-8 flex animate-hero-in justify-center">
           <Logo variant="auth" />
         </div>
-        <h1 className="mb-2 text-center text-2xl font-bold">Create your account</h1>
-        <p className="mb-8 text-center text-sm text-[var(--muted)]">
+        <h1 className="animate-hero-in-delay-1 mb-2 text-center text-2xl font-bold">Create your account</h1>
+        <p className="animate-hero-in-delay-2 mb-8 text-center text-sm text-[var(--muted)]">
           Sign up with Google or email, then purchase credits to submit URLs — 1 credit per URL
         </p>
         <Suspense>
           <AuthPanel mode="register" />
         </Suspense>
       </section>
-      <Footer />
     </>
   );
 }

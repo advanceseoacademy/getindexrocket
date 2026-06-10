@@ -16,20 +16,20 @@ export function NavLoggedInActions({ creditBalance }: NavLoggedInActionsProps) {
   return (
     <div className="flex items-center gap-3">
       {creditBalance != null && (
-        <span className="hidden text-sm text-[var(--muted)] sm:inline">
+        <span className="hidden text-base text-[var(--muted)] sm:inline">
           {creditBalance} credits
         </span>
       )}
       <Link
         href="/dashboard"
-        className="rounded-[10px] bg-[var(--green)] px-4 py-2 text-sm font-semibold text-[#050f08] no-underline"
+        className="rounded-[10px] bg-[var(--green)] px-4 py-2 text-base font-semibold text-[var(--on-accent)] no-underline"
       >
         Dashboard
       </Link>
       <button
         type="button"
         onClick={logout}
-        className="text-sm text-[var(--muted)] hover:text-[var(--text)]"
+        className="text-base text-[var(--muted)] hover:text-[var(--text)]"
       >
         Logout
       </button>

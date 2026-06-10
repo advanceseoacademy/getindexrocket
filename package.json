@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "npm run icons:generate && prisma generate && next build",
     "start": "next start",
     "start:prod": "prisma migrate deploy && next start",
     "lint": "eslint",
@@ -23,7 +23,9 @@
     "google:origins": "node scripts/configure-google-origins.mjs",
     "db:studio": "prisma studio",
     "db:migrate:sqlite": "node scripts/migrate-sqlite-to-supabase.mjs",
-    "grant:credits": "node scripts/grant-credits.mjs"
+    "grant:credits": "node scripts/grant-credits.mjs",
+    "admin:password": "node scripts/set-admin-password.mjs",
+    "icons:generate": "node scripts/generate-favicons.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -44,7 +46,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "sharp": "^0.35.0",
     "tailwindcss": "^4",
+    "to-ico": "^1.1.5",
     "typescript": "^5"
   }
 }

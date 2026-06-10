@@ -86,7 +86,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-[10px] bg-[var(--green)] py-3 font-semibold text-[#050f08] disabled:opacity-60"
+        className="w-full rounded-[10px] bg-[var(--green)] py-3 font-semibold text-[var(--on-accent)] disabled:opacity-60 btn-primary"
       >
         {loading ? "Please wait..." : mode === "login" ? "Sign in" : "Create account"}
       </button>

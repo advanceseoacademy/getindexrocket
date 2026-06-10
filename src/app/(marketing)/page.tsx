@@ -1,7 +1,7 @@
-import { Footer } from "@/components/layout/Footer";
 import { HomeJsonLd } from "@/components/marketing/JsonLd";
 import { Hero } from "@/components/marketing/Hero";
 import { HomeSections } from "@/components/marketing/HomeSections";
+import { HomeSeoSection } from "@/components/marketing/HomeSeoSection";
 import { APP_NAME } from "@/lib/brand";
 import { buildPageMetadata } from "@/lib/seo-metadata";
 
@@ -31,7 +31,7 @@ export default function HomePage() {
       <HomeJsonLd />
       <Hero />
       <HomeSections />
-      <Footer />
+      <HomeSeoSection />
     </>
   );
 }

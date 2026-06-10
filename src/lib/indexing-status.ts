@@ -26,10 +26,10 @@ export const FILTER_TABS: { id: "all" | StatusBucket; label: string }[] = [
 type StatusStyle = { label: string; color: string; bg: string };
 
 const BUCKET_META: Record<StatusBucket, StatusStyle> = {
-  crawled: { label: "CRAWLED", color: "var(--green)", bg: "rgba(34,211,122,0.14)" },
-  discovered: { label: "DISCOVERED", color: "var(--blue)", bg: "rgba(59,143,255,0.14)" },
-  submitted: { label: "SUBMITTED", color: "var(--blue)", bg: "rgba(59,143,255,0.1)" },
-  processing: { label: "PROCESSING", color: "var(--blue)", bg: "rgba(59,143,255,0.12)" },
+  crawled: { label: "CRAWLED", color: "var(--success)", bg: "var(--blue-14)" },
+  discovered: { label: "DISCOVERED", color: "var(--cyan)", bg: "var(--blue-12)" },
+  submitted: { label: "SUBMITTED", color: "var(--blue)", bg: "var(--blue-10)" },
+  processing: { label: "PROCESSING", color: "var(--blue)", bg: "var(--blue-12)" },
   pending: { label: "PENDING", color: "var(--muted)", bg: "rgba(255,255,255,0.06)" },
   refunded: { label: "REFUNDED", color: "var(--amber)", bg: "rgba(245,166,35,0.14)" },
   failed: { label: "FAILED", color: "#f87171", bg: "rgba(248,113,113,0.14)" },

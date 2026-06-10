@@ -22,7 +22,7 @@ type Task = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  indexed: "text-[var(--green)]",
+  indexed: "text-[var(--success)]",
   pending: "text-[var(--amber)]",
   processing: "text-[var(--blue)]",
   refunded: "text-[var(--muted)]",

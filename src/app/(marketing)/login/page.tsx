@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { AuthPanel } from "@/components/auth/AuthPanel";
-import { Footer } from "@/components/layout/Footer";
 import { Logo } from "@/components/layout/Logo";
 import { BreadcrumbJsonLd } from "@/components/marketing/JsonLd";
 import { APP_NAME } from "@/lib/brand";
@@ -25,18 +24,17 @@ export default function LoginPage() {
         ]}
       />
       <section className="site-container py-16">
-        <div className="mb-8 flex justify-center">
+        <div className="mb-8 flex animate-hero-in justify-center">
           <Logo variant="auth" />
         </div>
-        <h1 className="mb-2 text-center text-2xl font-bold">Sign in</h1>
-        <p className="mb-8 text-center text-sm text-[var(--muted)]">
+        <h1 className="animate-hero-in-delay-1 mb-2 text-center text-2xl font-bold">Sign in</h1>
+        <p className="animate-hero-in-delay-2 mb-8 text-center text-sm text-[var(--muted)]">
           Sign in with Google or your email to access your dashboard
         </p>
         <Suspense>
           <AuthPanel mode="login" />
         </Suspense>
       </section>
-      <Footer />
     </>
   );
 }
