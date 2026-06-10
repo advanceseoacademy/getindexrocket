@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  name               String?
+  password           String?
+  googleId           String?             @unique
+  role               String              @default("user")
+  creditBalance      Int                 @default(0)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  sessions           Session[]
+  tasks              Task[]
+  creditTransactions CreditTransaction[]
+  paymentEvents      PaymentEvent[]
+  memberships        Membership[]
+}
+
+model PaymentEvent {
+  id           String   @id @default(cuid())
+  externalId   String   @unique
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email        String
+  amountUsd    Float
+  creditsAdded Int
+  planId       String?
+  eventType    String?
+  provider     String   @default("buymeacoffee")
+  createdAt    DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([userId, createdAt])
+}
+
+model Membership {
+  id                 String    @id @default(cuid())
+  externalSubId      String    @unique
+  userId             String?
+  user               User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email              String
+  levelName          String?
+  levelId            String?
+  status             String    @default("active")
+  amountUsd          Float     @default(0)
+  paused             Boolean   @default(false)
+  cancelAtPeriodEnd  Boolean   @default(false)
+  canceledAt         DateTime?
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([email])
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Task {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  externalId     String?   @unique
+  providerTaskId String?
+  tier           String    @default("standard")
+  status         String    @default("pending")
+  urlsCount      Int       @default(0)
+  creditsCharged Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  urls           TaskUrl[]
+
+  @@index([userId, createdAt])
+}
+
+model TaskUrl {
+  id        String    @id @default(cuid())
+  taskId    String
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  url       String
+  status    String    @default("pending")
+  indexedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([taskId])
+}
+
+model CreditTransaction {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       Int
+  balanceAfter Int
+  type         String
+  description  String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
