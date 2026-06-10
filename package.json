@@ -11,6 +11,7 @@
     "db:backup": "node scripts/db-backup.mjs",
     "db:audit": "node scripts/db-audit.mjs",
     "db:check": "node scripts/db-check-connection.mjs",
+    "db:fix:credits-column": "node scripts/db-apply-intended-credits.mjs",
     "db:restore": "node scripts/db-restore.mjs",
     "db:seed": "node scripts/db-seed.mjs",
     "db:push": "node scripts/safe-db-push.mjs",
