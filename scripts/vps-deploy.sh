@@ -24,11 +24,11 @@ git pull origin main
 echo "--- Install dependencies ---"
 npm ci
 
-echo "--- Backup database ---"
-npm run db:backup || echo "WARN: backup failed (continuing)"
-
 echo "--- Database migrations ---"
 npm run db:migrate:deploy
+
+echo "--- Backup database ---"
+npm run db:backup || echo "WARN: backup failed (continuing)"
 
 echo "--- Seed admin roles ---"
 npm run db:seed || true
