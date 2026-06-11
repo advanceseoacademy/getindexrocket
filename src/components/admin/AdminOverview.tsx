@@ -29,6 +29,12 @@ type Stats = {
   }[];
 };
 
+function isStats(value: unknown): value is Stats {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Stats;
+  return Boolean(v.users && v.credits && v.tasks && v.payments && v.memberships && v.recentPayments);
+}
+
 export function AdminOverview() {
   const [data, setData] = useState<Stats | null>(null);
   const [providerLoading, setProviderLoading] = useState(true);
@@ -44,6 +50,7 @@ export function AdminOverview() {
       })
       .then((stats) => {
         if (cancelled) return;
+        if (!isStats(stats)) throw new Error("Invalid admin stats response");
         setData(stats);
         return fetch("/api/admin/stats?provider=1");
       })

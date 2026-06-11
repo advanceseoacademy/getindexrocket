@@ -10,7 +10,9 @@ export default async function AdminShellLayout({ children }: { children: React.R
 
   return (
     <>
-      <Nav user={user} />
+      <Nav
+        user={{ email: user.email, creditBalance: user.creditBalance }}
+      />
       <main id="main-content" className="site-container flex-1 py-10 animate-page-in">
         <AdminNav />
         {children}

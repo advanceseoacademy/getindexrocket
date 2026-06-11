@@ -83,7 +83,7 @@ export function formatDate(iso: string) {
 }
 
 export function formatUsd(n: number) {
-  return `$${n.toFixed(2)}`;
+  return `$${Number(n || 0).toFixed(2)}`;
 }
 
 export function AdminLoading() {
