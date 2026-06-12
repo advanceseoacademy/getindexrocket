@@ -14,7 +14,7 @@ type NavProps = {
 
 export function Nav({ user = null }: NavProps) {
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--card-border)] bg-[rgba(10,13,18,0.85)] backdrop-blur-md">
+    <header className="site-header sticky top-0 z-50 border-b border-[var(--card-border)] bg-[rgba(10,13,18,0.85)] backdrop-blur-md">
       <div className="site-container flex items-center justify-between py-4">
         <Logo variant="nav" />
 

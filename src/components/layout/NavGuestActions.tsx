@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function NavGuestActions() {
   return (
-    <div className="flex items-center gap-3">
+    <div className="nav-actions flex min-h-10 min-w-[11.5rem] shrink-0 items-center justify-end gap-3 sm:min-w-[17rem]">
       <Link
         href="/login"
         className="text-base text-[var(--muted)] no-underline hover:text-[var(--text)]"

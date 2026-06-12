@@ -18,21 +18,26 @@ export function Logo({ variant = "nav", linked = true, className = "" }: LogoPro
   const { height, width } = SIZES[variant];
 
   const image = (
-    <Image
-      src={LOGO_PATH}
-      alt={LOGO_ALT}
-      width={width}
-      height={height}
-      className={`h-auto w-auto object-contain ${className}`}
-      style={{ maxHeight: height }}
-      priority={variant === "nav"}
-    />
+    <span
+      className={`logo-slot logo-slot-${variant} inline-flex shrink-0 items-center justify-center ${className}`}
+      style={{ width, height, minWidth: width, minHeight: height }}
+    >
+      <Image
+        src={LOGO_PATH}
+        alt={LOGO_ALT}
+        width={width}
+        height={height}
+        className="h-full w-full object-contain object-left"
+        priority={variant === "nav"}
+        sizes={`${width}px`}
+      />
+    </span>
   );
 
   if (!linked) return image;
 
   return (
-    <Link href="/" className={`inline-flex shrink-0 items-center no-underline ${className}`}>
+    <Link href="/" className="inline-flex shrink-0 items-center no-underline">
       {image}
     </Link>
   );

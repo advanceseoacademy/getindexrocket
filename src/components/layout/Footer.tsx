@@ -2,9 +2,11 @@ import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
 import { APP_NAME } from "@/lib/brand";
 
+const FOOTER_YEAR = new Date().getFullYear();
+
 export function Footer() {
   return (
-    <footer className="border-t border-[var(--card-border)] py-12">
+    <footer className="site-footer border-t border-[var(--card-border)] py-12">
       <div className="site-container">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-2">
@@ -53,7 +55,7 @@ export function Footer() {
           </div>
         </div>
         <p className="mt-10 text-xs text-[var(--muted2)]">
-          © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
+          © {FOOTER_YEAR} {APP_NAME}. All rights reserved.
         </p>
       </div>
     </footer>

@@ -8,6 +8,8 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   preload: true,
+  adjustFontFallback: true,
+  fallback: ["system-ui", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
 });
 
 export const metadata: Metadata = SITE_METADATA;

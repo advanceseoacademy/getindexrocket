@@ -14,7 +14,7 @@ export function NavLoggedInActions({ creditBalance }: NavLoggedInActionsProps) {
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="nav-actions flex min-h-10 min-w-[11.5rem] shrink-0 items-center justify-end gap-3 sm:min-w-[17rem]">
       {creditBalance != null && (
         <span className="hidden text-base text-[var(--muted)] sm:inline">
           {creditBalance} credits

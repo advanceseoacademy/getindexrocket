@@ -1,23 +1,18 @@
+import { Suspense } from "react";
 import { Footer } from "@/components/layout/Footer";
 import { Nav } from "@/components/layout/Nav";
-import { getSessionUser } from "@/lib/auth";
+import { NavWithSession } from "@/components/layout/NavWithSession";
 
-export default async function MarketingLayout({
+export default function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const sessionUser = await getSessionUser();
-
   return (
     <div className="flex min-h-full flex-col">
-      <Nav
-        user={
-          sessionUser
-            ? { email: sessionUser.email, creditBalance: sessionUser.creditBalance }
-            : null
-        }
-      />
+      <Suspense fallback={<Nav user={null} />}>
+        <NavWithSession />
+      </Suspense>
       <main id="main-content" className="flex-1">
         {children}
       </main>
