@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CREDIT_PER_URL } from "@/lib/brand";
+import { VERIFICATION_CREDIT_PER_URL, calculateSubmitCost } from "@/lib/submit-cost";
 import { invalidateCache, invalidateDashboardCache } from "@/lib/client-cache";
 
 type DashboardSubmitPanelProps = {
@@ -9,12 +10,47 @@ type DashboardSubmitPanelProps = {
   onSubmitted?: () => void;
 };
 
+function Toggle({
+  checked,
+  onChange,
+  disabled,
+  id,
+}: {
+  checked: boolean;
+  onChange: (value: boolean) => void;
+  disabled?: boolean;
+  id: string;
+}) {
+  return (
+    <button
+      id={id}
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:cursor-not-allowed disabled:opacity-40 ${
+        checked ? "bg-[var(--blue)]" : "bg-[var(--bg3)]"
+      }`}
+    >
+      <span
+        className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition ${
+          checked ? "translate-x-5" : "translate-x-0"
+        }`}
+      />
+    </button>
+  );
+}
+
 export function DashboardSubmitPanel({
   creditBalance: initialBalance,
   onSubmitted,
 }: DashboardSubmitPanelProps) {
   const [creditBalance, setCreditBalance] = useState(initialBalance);
   const [urls, setUrls] = useState("");
+  const [taskName, setTaskName] = useState("");
+  const [dripFeed, setDripFeed] = useState(false);
+  const [smartVerification, setSmartVerification] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -29,7 +65,9 @@ export function DashboardSubmitPanel({
   }, []);
 
   const urlCount = urls.split(/\r?\n/).filter((l) => l.trim().startsWith("http")).length;
-  const cost = CREDIT_PER_URL * urlCount;
+  const { indexCost, checkCost, total: cost } = calculateSubmitCost(urlCount, {
+    smartVerification,
+  });
   const balanceAfter = creditBalance - cost;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -42,7 +80,12 @@ export function DashboardSubmitPanel({
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ urls }),
+        body: JSON.stringify({
+          urls,
+          taskName: taskName.trim() || undefined,
+          smartVerification,
+          dripFeed,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -51,6 +94,9 @@ export function DashboardSubmitPanel({
       }
       setSuccess(`${data.task.urlsCount} URL(s) submitted successfully.`);
       setUrls("");
+      setTaskName("");
+      setDripFeed(false);
+      setSmartVerification(false);
       if (typeof data.creditBalance === "number") {
         setCreditBalance(data.creditBalance);
       }
@@ -154,17 +200,68 @@ export function DashboardSubmitPanel({
       <button
         type="button"
         onClick={() => setShowAdvanced((v) => !v)}
-        className="mt-4 flex items-center gap-2 text-xs text-[var(--muted)] hover:text-[var(--text)]"
+        className="mt-4 flex w-full items-center gap-2 rounded-xl border border-dashed border-[var(--card-border)] bg-[var(--bg2)] px-4 py-3 text-left text-xs text-[var(--muted)] hover:border-[var(--blue-25)] hover:text-[var(--text)]"
       >
         <span aria-hidden>⚙</span>
-        Advanced settings
-        <span className="text-[10px]">{showAdvanced ? "▲" : "▼"}</span>
+        <span>
+          Advanced settings
+          <span className="ml-1 text-[var(--muted2)]">
+            (task name, drip feed, verification — usually not needed)
+          </span>
+        </span>
+        <span className="ml-auto text-[10px]">{showAdvanced ? "▲" : "▼"}</span>
       </button>
 
       {showAdvanced && (
-        <p className="mt-2 rounded-lg border border-[var(--card-border)] bg-[var(--bg2)] px-3 py-2 text-xs text-[var(--muted)]">
-          Standard indexing tier is used for all submissions. Duplicate URLs are not charged again.
-        </p>
+        <div className="mt-3 space-y-4 rounded-xl border border-dashed border-[var(--card-border)] bg-[var(--bg2)] p-4">
+          <div>
+            <label htmlFor="task-name" className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
+              Task name (optional)
+            </label>
+            <input
+              id="task-name"
+              type="text"
+              value={taskName}
+              onChange={(e) => setTaskName(e.target.value)}
+              maxLength={120}
+              placeholder="e.g. My New Blog Posts"
+              className="w-full rounded-xl border border-[var(--card-border)] bg-[var(--card)] px-4 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--blue)]"
+            />
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--card)] px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-[var(--text)]">
+                  Enable drip feed <span className="text-[var(--muted)]">∞</span>
+                </p>
+                <p className="mt-0.5 text-xs text-[var(--muted)]">Coming soon</p>
+              </div>
+              <Toggle
+                id="drip-feed"
+                checked={dripFeed}
+                onChange={setDripFeed}
+                disabled
+              />
+            </div>
+
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--card)] px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-[var(--text)]">
+                  Smart index verification <span className="text-[var(--success)]">✓</span>
+                </p>
+                <p className="mt-0.5 text-xs text-[var(--success)]">
+                  +{VERIFICATION_CREDIT_PER_URL} credit / link
+                </p>
+              </div>
+              <Toggle
+                id="smart-verification"
+                checked={smartVerification}
+                onChange={setSmartVerification}
+              />
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="mt-5 rounded-xl border border-[var(--card-border)] bg-[var(--bg2)] px-4 py-3 text-sm">
@@ -174,11 +271,19 @@ export function DashboardSubmitPanel({
         </div>
         <div className="mt-2 flex justify-between text-[var(--muted)]">
           <span>Cost</span>
-          <span className="text-[var(--text)]">{cost} credits</span>
+          <div className="text-right">
+            <span className="text-[var(--text)]">{cost} credits</span>
+            <p className="mt-0.5 text-xs text-[var(--muted2)]">
+              Index: {indexCost} · Check: {checkCost}
+            </p>
+          </div>
         </div>
         <div className="mt-2 flex justify-between text-[var(--muted)]">
           <span>Balance after submit</span>
-          <span className="font-medium text-[var(--text)]">{Math.max(0, balanceAfter)}</span>
+          <div className="text-right">
+            <span className="font-medium text-[var(--text)]">{Math.max(0, balanceAfter)}</span>
+            <p className="mt-0.5 text-xs text-[var(--muted2)]">Now: {creditBalance}</p>
+          </div>
         </div>
       </div>
 

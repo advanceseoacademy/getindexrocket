@@ -184,8 +184,9 @@ export const getSessionUser = cache(async function getSessionUser(): Promise<Ses
     }
   }
 
+  // Cookie writes are only allowed in Route Handlers / Server Actions (Next.js 16+).
+  // When cache is stale, load from DB without refreshing gir_user here.
   const user = await loadUserFromDb(token);
-  if (user) await setUserCookie(user);
   return user;
 });
 

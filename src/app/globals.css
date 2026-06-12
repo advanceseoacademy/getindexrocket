@@ -420,3 +420,99 @@ details.faq-item[open] summary {
     transform: none;
   }
 }
+
+/* CKEditor — dark admin theme */
+.blog-rich-editor .ck.ck-editor__main > .ck-editor__editable {
+  min-height: 320px;
+  background: var(--bg2) !important;
+  color: var(--text) !important;
+  border-color: var(--card-border) !important;
+}
+
+.blog-rich-editor .ck.ck-toolbar {
+  background: var(--bg3) !important;
+  border-color: var(--card-border) !important;
+}
+
+.blog-rich-editor .ck.ck-toolbar .ck-button,
+.blog-rich-editor .ck.ck-toolbar .ck-dropdown__button {
+  color: var(--text) !important;
+}
+
+.blog-rich-editor .ck.ck-toolbar .ck-button:hover,
+.blog-rich-editor .ck.ck-toolbar .ck-dropdown__button:hover {
+  background: var(--bg4) !important;
+}
+
+.blog-rich-editor .ck.ck-toolbar .ck-button.ck-on {
+  background: var(--accent-15) !important;
+  color: var(--accent) !important;
+}
+
+.blog-rich-editor .ck.ck-editor__editable:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-15) !important;
+}
+
+.blog-rich-editor .ck.ck-editor__editable blockquote {
+  border-left: 4px solid var(--accent);
+  padding-left: 1rem;
+  color: var(--muted);
+}
+
+.blog-rich-editor .ck.ck-editor__editable a {
+  color: var(--blue);
+}
+
+/* Published blog HTML content */
+.blog-content-html h2 {
+  margin-top: 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.blog-content-html h3 {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.blog-content-html p {
+  margin-bottom: 1rem;
+}
+
+.blog-content-html ul,
+.blog-content-html ol {
+  margin: 0 0 1rem 1.25rem;
+}
+
+.blog-content-html ul {
+  list-style: disc;
+}
+
+.blog-content-html ol {
+  list-style: decimal;
+}
+
+.blog-content-html li {
+  margin-bottom: 0.35rem;
+}
+
+.blog-content-html blockquote {
+  margin: 1.25rem 0;
+  border-left: 4px solid var(--accent);
+  padding-left: 1rem;
+  color: var(--muted);
+}
+
+.blog-content-html a {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+.blog-content-html strong {
+  font-weight: 600;
+  color: var(--text);
+}

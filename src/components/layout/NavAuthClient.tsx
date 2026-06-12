@@ -1,75 +1,111 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { clearAuthClientCache } from "@/lib/auth-client-cache";
+import { NavGuestActions } from "@/components/layout/NavGuestActions";
 import { NavLoggedInActions } from "@/components/layout/NavLoggedInActions";
 
-export function NavAuthClient() {
-  const [mounted, setMounted] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
+type NavAuthClientProps = {
+  serverUser?: { email: string; creditBalance: number } | null;
+  isAdmin?: boolean;
+};
+
+type AuthState = "checking" | "guest" | "authed";
+
+function hasAuthCookie() {
+  return typeof document !== "undefined" && document.cookie.includes("gir_auth=1");
+}
+
+function readCreditsFromCache() {
+  try {
+    const raw = sessionStorage.getItem("gir_user_cache");
+    if (!raw) return null;
+    const user = JSON.parse(raw) as { creditBalance?: number };
+    return user.creditBalance ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function NavActionsSkeleton() {
+  return (
+    <div className="nav-actions flex min-h-10 min-w-[11.5rem] shrink-0 items-center justify-end gap-3 sm:min-w-[17rem]">
+      <span className="hidden h-4 w-20 animate-pulse rounded bg-[var(--bg3)] sm:inline" />
+      <span className="h-9 w-28 animate-pulse rounded-[10px] bg-[var(--bg3)]" />
+    </div>
+  );
+}
+
+export function NavAuthClient({ serverUser = null, isAdmin = false }: NavAuthClientProps) {
+  const [state, setState] = useState<AuthState>("checking");
   const [credits, setCredits] = useState<number | null>(null);
+  const [admin, setAdmin] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    const authed = document.cookie.includes("gir_auth=1");
-    setLoggedIn(authed);
+    if (serverUser) return;
 
-    if (authed) {
-      const cached = sessionStorage.getItem("gir_user_cache");
-      if (cached) {
-        try {
-          const user = JSON.parse(cached) as { creditBalance?: number };
-          if (user.creditBalance != null) setCredits(user.creditBalance);
-        } catch {
-          /* ignore */
+    let cancelled = false;
+
+    async function resolveAuth() {
+      if (!hasAuthCookie()) {
+        clearAuthClientCache();
+        if (!cancelled) setState("guest");
+        return;
+      }
+
+      const cachedCredits = readCreditsFromCache();
+      if (cachedCredits != null && !cancelled) {
+        setCredits(cachedCredits);
+        setState("authed");
+      }
+
+      try {
+        const res = await fetch("/api/account", { credentials: "same-origin" });
+        if (!res.ok) {
+          clearAuthClientCache();
+          if (!cancelled) setState("guest");
+          return;
+        }
+        const data = await res.json();
+        if (!cancelled && data?.user) {
+          setCredits(data.user.creditBalance ?? null);
+          setAdmin(data.user.isAdmin === true);
+          setState("authed");
+          sessionStorage.setItem("gir_user_cache", JSON.stringify(data.user));
+        } else if (!cancelled) {
+          clearAuthClientCache();
+          setState("guest");
+        }
+      } catch {
+        if (!cancelled) {
+          setAdmin(false);
+          setState(cachedCredits != null ? "authed" : "guest");
         }
       }
-      fetch("/api/account", { credentials: "same-origin" })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data?.user?.creditBalance != null) setCredits(data.user.creditBalance);
-        })
-        .catch(() => {});
     }
-  }, []);
 
-  if (!mounted) {
+    resolveAuth();
+    return () => {
+      cancelled = true;
+    };
+  }, [serverUser]);
+
+  if (serverUser) {
     return (
-      <div className="flex items-center gap-3">
-        <Link
-          href="/login"
-          className="text-base text-[var(--muted)] no-underline hover:text-[var(--text)]"
-        >
-          Login
-        </Link>
-        <Link
-          href="/register"
-          className="rounded-[10px] bg-[var(--green)] px-4 py-2 text-base font-semibold text-[var(--on-accent)] no-underline"
-        >
-          Get Started
-        </Link>
-      </div>
+      <NavLoggedInActions
+        creditBalance={serverUser.creditBalance}
+        isAdmin={isAdmin}
+      />
     );
   }
 
-  if (loggedIn) {
-    return <NavLoggedInActions creditBalance={credits} />;
+  if (state === "authed") {
+    return <NavLoggedInActions creditBalance={credits} isAdmin={admin} />;
   }
 
-  return (
-    <div className="flex items-center gap-3">
-      <Link
-        href="/login"
-        className="text-base text-[var(--muted)] no-underline hover:text-[var(--text)]"
-      >
-        Login
-      </Link>
-      <Link
-        href="/register"
-        className="rounded-[10px] bg-[var(--green)] px-4 py-2 text-base font-semibold text-[var(--on-accent)] no-underline"
-      >
-        Get Started
-      </Link>
-    </div>
-  );
+  if (state === "checking") {
+    return <NavActionsSkeleton />;
+  }
+
+  return <NavGuestActions />;
 }

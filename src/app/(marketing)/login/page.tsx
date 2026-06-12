@@ -1,11 +1,13 @@
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { Logo } from "@/components/layout/Logo";
 import { BreadcrumbJsonLd } from "@/components/marketing/JsonLd";
+import { getSessionUser, isAdmin } from "@/lib/auth";
 import { APP_NAME } from "@/lib/brand";
 import { buildPageMetadata } from "@/lib/seo-metadata";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export const metadata = buildPageMetadata({
   title: "Sign In",
@@ -14,7 +16,10 @@ export const metadata = buildPageMetadata({
   index: false,
 });
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const user = await getSessionUser();
+  if (user && isAdmin(user)) redirect("/admin");
+
   return (
     <>
       <BreadcrumbJsonLd

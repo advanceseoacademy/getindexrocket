@@ -1,12 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Nav } from "@/components/layout/Nav";
-import { DashboardNav } from "@/components/dashboard/DashboardNav";
 import { DashboardHome } from "@/components/dashboard/DashboardHome";
-import { SubmitFormLoader } from "@/components/dashboard/SubmitFormLoader";
 import { IndexingReport } from "@/components/dashboard/IndexingReport";
 import { BillingLoader } from "@/components/billing/BillingLoader";
 import { SettingsContent } from "@/components/dashboard/SettingsContent";
@@ -14,11 +12,9 @@ import { useUser } from "@/components/dashboard/UserProvider";
 import { prefetch } from "@/lib/client-cache";
 
 import type { DashboardPath } from "@/lib/dashboard-nav";
-import { navigateDashboard } from "@/lib/dashboard-nav";
 
 const DASHBOARD_PATHS: DashboardPath[] = [
   "/dashboard",
-  "/submit",
   "/tasks",
   "/billing",
   "/settings",
@@ -26,11 +22,15 @@ const DASHBOARD_PATHS: DashboardPath[] = [
 
 const VIEW: Record<DashboardPath, () => ReactNode> = {
   "/dashboard": () => <DashboardHome />,
-  "/submit": () => <SubmitFormLoader />,
   "/tasks": () => <IndexingReport />,
   "/billing": () => <BillingLoader />,
   "/settings": () => <SettingsContent />,
 };
+
+function resolveDashboardPath(path: string): DashboardPath {
+  if (path === "/submit") return "/dashboard";
+  return DASHBOARD_PATHS.includes(path as DashboardPath) ? (path as DashboardPath) : "/dashboard";
+}
 
 function isDashboardPath(path: string): path is DashboardPath {
   return DASHBOARD_PATHS.includes(path as DashboardPath);
@@ -61,17 +61,9 @@ export function DashboardChrome() {
   const routerPathname = usePathname();
   const { user, loading } = useUser();
 
-  const initialPath = isDashboardPath(routerPathname) ? routerPathname : "/dashboard";
+  const initialPath = resolveDashboardPath(routerPathname);
   const [activePath, setActivePath] = useState<DashboardPath>(initialPath);
   const [mounted, setMounted] = useState<Set<DashboardPath>>(() => new Set([initialPath]));
-
-  const navigateInstant = useCallback((href: DashboardPath) => {
-    setActivePath(href);
-    setMounted((prev) => new Set(prev).add(href));
-    navigateDashboard(href);
-    if (href === "/dashboard") prefetch("/api/dashboard?skipSync=1");
-    if (href === "/tasks") prefetch("/api/tasks?skipSync=1");
-  }, []);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -84,15 +76,24 @@ export function DashboardChrome() {
   }, []);
 
   useEffect(() => {
+    if (routerPathname === "/submit") {
+      router.replace("/dashboard");
+      return;
+    }
     if (isDashboardPath(routerPathname)) {
       setActivePath(routerPathname);
       setMounted((prev) => new Set(prev).add(routerPathname));
     }
-  }, [routerPathname]);
+  }, [routerPathname, router]);
 
   useEffect(() => {
     const onPop = () => {
       const path = window.location.pathname;
+      if (path === "/submit") {
+        window.history.replaceState(null, "", "/dashboard");
+        setActivePath("/dashboard");
+        return;
+      }
       if (isDashboardPath(path)) setActivePath(path);
     };
     window.addEventListener("popstate", onPop);
@@ -111,7 +112,7 @@ export function DashboardChrome() {
   if (loading && !user) {
     return (
       <>
-        <Nav />
+        <Nav showDashboardNav />
         <main className="site-container flex-1 py-10">
           <ShellSkeleton />
         </main>
@@ -123,12 +124,11 @@ export function DashboardChrome() {
 
   return (
     <>
-      <Nav user={user} />
+      <Nav user={user} showDashboardNav />
       <main
         id="main-content"
         className="site-container flex-1 py-10 animate-page-in"
       >
-        <DashboardNav activePath={activePath} onNavigate={navigateInstant} />
         {Array.from(mounted).map((path) => {
           const View = VIEW[path];
           const hidden = path !== activePath;

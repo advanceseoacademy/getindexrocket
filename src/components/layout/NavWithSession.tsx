@@ -1,5 +1,7 @@
 import { Nav } from "@/components/layout/Nav";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser, isAdmin } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 
 export async function NavWithSession() {
   const sessionUser = await getSessionUser();
@@ -11,6 +13,7 @@ export async function NavWithSession() {
           ? { email: sessionUser.email, creditBalance: sessionUser.creditBalance }
           : null
       }
+      isAdmin={isAdmin(sessionUser)}
     />
   );
 }

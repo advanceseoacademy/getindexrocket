@@ -28,8 +28,10 @@
     "icons:generate": "node scripts/generate-favicons.mjs"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-react": "^11.2.0",
     "@prisma/client": "^6.19.3",
     "@react-oauth/google": "^0.13.5",
+    "ckeditor5": "^48.2.0",
     "google-auth-library": "^10.7.0",
     "nanoid": "^5.1.11",
     "next": "16.2.9",

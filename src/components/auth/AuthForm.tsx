@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { clearAuthClientCache } from "@/lib/auth-client-cache";
 
 type AuthFormProps = {
   mode: "login" | "register";
@@ -33,6 +34,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         setError(data.error ?? "Something went wrong");
         return;
       }
+      clearAuthClientCache();
       const next = searchParams.get("next") ?? "/dashboard";
       router.push(next);
       router.refresh();

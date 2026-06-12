@@ -1,6 +1,5 @@
 export type DashboardPath =
   | "/dashboard"
-  | "/submit"
   | "/tasks"
   | "/billing"
   | "/settings";

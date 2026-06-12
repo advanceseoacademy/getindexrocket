@@ -1,9 +1,10 @@
 import { refreshUserCache } from "./auth";
 import { prisma } from "./prisma";
 import { CREDIT_PER_URL } from "./brand";
+import { calculateSubmitCost, type SubmitOptions } from "./submit-cost";
 
-export function getCreditCost(urlCount: number) {
-  return CREDIT_PER_URL * urlCount;
+export function getCreditCost(urlCount: number, options: SubmitOptions = {}) {
+  return calculateSubmitCost(urlCount, options).total;
 }
 
 export async function deductCredits(

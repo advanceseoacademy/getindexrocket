@@ -227,7 +227,7 @@ export function IndexingReport() {
           </button>
           <button
             type="button"
-            onClick={() => navigateDashboard("/submit")}
+            onClick={() => navigateDashboard("/dashboard")}
             className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--blue)] px-4 py-2 text-sm font-semibold text-white"
           >
             <span className="text-lg leading-none">+</span> New
@@ -268,7 +268,7 @@ export function IndexingReport() {
           <p className="text-[var(--muted)]">No tasks found.</p>
           <button
             type="button"
-            onClick={() => navigateDashboard("/submit")}
+            onClick={() => navigateDashboard("/dashboard")}
             className="mt-4 rounded-lg bg-[var(--blue)] px-5 py-2.5 text-sm font-semibold text-white"
           >
             + Submit your first URLs

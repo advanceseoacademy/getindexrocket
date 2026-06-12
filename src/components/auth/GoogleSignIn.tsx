@@ -3,6 +3,7 @@
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { clearAuthClientCache } from "@/lib/auth-client-cache";
 
 type GoogleSignInProps = {
   mode: "login" | "register";
@@ -52,6 +53,7 @@ export function GoogleSignIn({ mode }: GoogleSignInProps) {
         setError(data.error ?? "Google sign-in failed");
         return;
       }
+      clearAuthClientCache();
       const next = searchParams.get("next") ?? "/dashboard";
       router.push(next);
       router.refresh();

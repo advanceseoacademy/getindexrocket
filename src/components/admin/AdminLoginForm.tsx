@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { clearAuthClientCache } from "@/lib/auth-client-cache";
 
 export function AdminLoginForm() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export function AdminLoginForm() {
         setError(data.error ?? "Sign in failed");
         return;
       }
+      clearAuthClientCache();
       router.push("/admin");
       router.refresh();
     } catch {

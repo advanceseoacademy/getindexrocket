@@ -138,7 +138,7 @@ export function RecentTaskCard({
   function handleResubmitAll() {
     const all = task.urls.map((u) => u.url).join("\n");
     sessionStorage.setItem("gir_resubmit_urls", all);
-    navigateDashboard("/submit");
+    navigateDashboard("/dashboard");
   }
 
   function handleOpen() {

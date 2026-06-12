@@ -28,6 +28,9 @@ export function Footer() {
               <Link href="/pricing" className="no-underline hover:text-[var(--text)]">
                 Pricing
               </Link>
+              <Link href="/blog" className="no-underline hover:text-[var(--text)]">
+                Blog
+              </Link>
               <Link href="/#faq" className="no-underline hover:text-[var(--text)]">
                 FAQ
               </Link>

@@ -23,6 +23,7 @@ model User {
   creditTransactions CreditTransaction[]
   paymentEvents      PaymentEvent[]
   memberships        Membership[]
+  blogPosts          BlogPost[]
 }
 
 model PaymentEvent {
@@ -117,4 +118,23 @@ model CreditTransaction {
   createdAt    DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+model BlogPost {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  excerpt         String?
+  content         String    @db.Text
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  status          String    @default("draft")
+  publishedAt     DateTime?
+  authorId        String?
+  author          User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status, publishedAt])
 }

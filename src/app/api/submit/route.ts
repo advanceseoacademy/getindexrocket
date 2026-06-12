@@ -9,6 +9,9 @@ import { normalizeUrls } from "@/lib/urls";
 
 const schema = z.object({
   urls: z.string().min(1),
+  taskName: z.string().max(120).optional(),
+  smartVerification: z.boolean().optional().default(false),
+  dripFeed: z.boolean().optional().default(false),
 });
 
 export async function POST(request: Request) {
@@ -20,6 +23,14 @@ export async function POST(request: Request) {
   try {
     const body = schema.parse(await request.json());
     const urls = normalizeUrls(body.urls);
+    const taskName = body.taskName?.trim() || undefined;
+
+    if (body.dripFeed) {
+      return NextResponse.json(
+        { error: "Drip feed is coming soon and is not available yet." },
+        { status: 400 },
+      );
+    }
 
     if (urls.length === 0) {
       return NextResponse.json({ error: "No valid URLs found" }, { status: 400 });
@@ -33,7 +44,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const creditCost = getCreditCost(urls.length);
+    const creditCost = getCreditCost(urls.length, {
+      smartVerification: body.smartVerification,
+    });
     if (auth.user.creditBalance < creditCost) {
       return NextResponse.json(
         {
@@ -47,7 +60,11 @@ export async function POST(request: Request) {
       auth.user.id,
       creditCost,
       "submit",
-      `${urls.length} URL(s)`,
+      taskName
+        ? `${urls.length} URL(s) — ${taskName}`
+        : body.smartVerification
+          ? `${urls.length} URL(s) + verification`
+          : `${urls.length} URL(s)`,
     );
 
     let external;
