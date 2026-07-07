@@ -102,6 +102,9 @@ export const SITE_METADATA: Metadata = {
       "max-snippet": -1,
     },
   },
+  verification: {
+    google: "fy7PUVqJhXuUDkq9RgYkxyRs3TK5PQT03I3_UUE484I",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
