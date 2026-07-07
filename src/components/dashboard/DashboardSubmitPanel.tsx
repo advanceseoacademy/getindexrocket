@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CREDIT_PER_URL } from "@/lib/brand";
 import { VERIFICATION_CREDIT_PER_URL, calculateSubmitCost } from "@/lib/submit-cost";
 import { invalidateCache, invalidateDashboardCache } from "@/lib/client-cache";
+import { consumeResubmitUrls } from "@/lib/resubmit-urls";
 
 type DashboardSubmitPanelProps = {
   creditBalance: number;
@@ -47,7 +48,7 @@ export function DashboardSubmitPanel({
   onSubmitted,
 }: DashboardSubmitPanelProps) {
   const [creditBalance, setCreditBalance] = useState(initialBalance);
-  const [urls, setUrls] = useState("");
+  const [urls, setUrls] = useState(consumeResubmitUrls);
   const [taskName, setTaskName] = useState("");
   const [dripFeed, setDripFeed] = useState(false);
   const [smartVerification, setSmartVerification] = useState(false);
@@ -55,14 +56,6 @@ export function DashboardSubmitPanel({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
-
-  useEffect(() => {
-    const pending = sessionStorage.getItem("gir_resubmit_urls");
-    if (pending) {
-      setUrls(pending);
-      sessionStorage.removeItem("gir_resubmit_urls");
-    }
-  }, []);
 
   const urlCount = urls.split(/\r?\n/).filter((l) => l.trim().startsWith("http")).length;
   const { indexCost, checkCost, total: cost } = calculateSubmitCost(urlCount, {

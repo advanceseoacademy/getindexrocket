@@ -58,6 +58,8 @@ if ! grep -q '^ADMIN_EMAILS=' .env; then
   echo 'ADMIN_EMAILS="mdlitonislam69@gmail.com"' >> .env
 fi
 
+node scripts/ensure-indexer-env.mjs .env || true
+
 bash scripts/vps-deploy.sh
 
 echo "--- Stop legacy indexflow PM2 (if running) ---"

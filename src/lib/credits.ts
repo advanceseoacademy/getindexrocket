@@ -76,11 +76,12 @@ export async function refundCredits(
   return addCredits(userId, amount, "refund", description);
 }
 
-/** Idempotent per-taskUrl refund when provider marks a URL as refunded. */
+/** Idempotent per-taskUrl refund when crawl verification fails. */
 export async function refundUrlIfEligible(
   userId: string,
   taskUrlId: string,
   url: string,
+  amount = CREDIT_PER_URL,
 ) {
   const marker = `taskUrl:${taskUrlId}`;
   const existing = await prisma.creditTransaction.findFirst({
@@ -91,7 +92,7 @@ export async function refundUrlIfEligible(
 
   await refundCredits(
     userId,
-    CREDIT_PER_URL,
+    amount,
     `Crawl failed — credit returned (${marker}) ${url}`,
   );
   return true;

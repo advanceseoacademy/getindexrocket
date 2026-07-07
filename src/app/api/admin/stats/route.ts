@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
-import { getAccountBalance } from "@/lib/indexnowfast";
+import { isBingWebmasterEnabled } from "@/lib/indexer/bing-webmaster";
+import { isGoogleIndexingEnabled } from "@/lib/indexer/google-indexing";
+import { getIndexNowKey, getIndexerOrigin } from "@/lib/indexer/config";
+import { isVerificationEnabled } from "@/lib/indexer/verify";
 import { prisma } from "@/lib/prisma";
 
 type CountRow = {
@@ -72,18 +75,24 @@ async function loadCounts(since30: Date): Promise<CountRow> {
   }
 }
 
-async function providerWithTimeout(ms = 2500) {
-  try {
-    const provider = await Promise.race([
-      getAccountBalance(),
-      new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error("provider timeout")), ms);
-      }),
-    ]);
-    return { providerBalance: provider.credit_balance, providerEmail: provider.email };
-  } catch {
-    return { providerBalance: null, providerEmail: null };
-  }
+async function indexerHealth() {
+  const [pendingUrls, activeHubs] = await Promise.all([
+    prisma.taskUrl.count({
+      where: { status: { in: ["pending", "submitted", "discovered", "processing"] } },
+    }),
+    prisma.taskUrl.count({ where: { hubToken: { not: null } } }),
+  ]);
+
+  return {
+    mode: "self-hosted",
+    origin: getIndexerOrigin(),
+    indexnowConfigured: Boolean(getIndexNowKey()),
+    bingWebmasterConfigured: isBingWebmasterEnabled(),
+    googleIndexingConfigured: isGoogleIndexingEnabled(),
+    verificationEnabled: isVerificationEnabled(),
+    pendingUrls,
+    activeHubs,
+  };
 }
 
 export async function GET(request: Request) {
@@ -95,8 +104,14 @@ export async function GET(request: Request) {
 
     const includeProvider = new URL(request.url).searchParams.get("provider") === "1";
     if (includeProvider) {
-      const credits = await providerWithTimeout();
-      return NextResponse.json({ credits });
+      const health = await indexerHealth();
+      return NextResponse.json({
+        credits: {
+          providerBalance: null,
+          providerEmail: `Self-hosted · ${health.pendingUrls} pending`,
+          indexer: health,
+        },
+      });
     }
 
     const since30 = new Date();
@@ -133,7 +148,7 @@ export async function GET(request: Request) {
       credits: {
         totalUserBalance: toNum(counts.total_credits),
         providerBalance: null,
-        providerEmail: null,
+        providerEmail: "Self-hosted indexer",
       },
       tasks: { total: toNum(counts.tasks), last30d: toNum(counts.tasks_30d) },
       payments: {

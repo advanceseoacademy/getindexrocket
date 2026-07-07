@@ -18,6 +18,19 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
+echo "--- Indexer env ---"
+node scripts/ensure-indexer-env.mjs .env || true
+
+echo "--- Production env check ---"
+node scripts/production-check.mjs || {
+  code=$?
+  if [[ "$code" -eq 1 ]]; then
+    echo "ERROR: production-check failed — fix .env before deploy."
+    exit 1
+  fi
+  echo "WARN: production-check warnings (continuing)"
+}
+
 echo "--- Git pull ---"
 git pull origin main
 
@@ -58,4 +71,33 @@ echo "============================================"
 echo " Deploy complete"
 PORT="${GETINDEXROCKET_PORT:-3005}"
 echo " Health: curl -s http://127.0.0.1:${PORT}/api/health"
+echo " Indexer: curl -s http://127.0.0.1:${PORT}/api/health/indexer"
 echo "============================================"
+
+echo ""
+echo "--- Post-deploy indexer bootstrap ---"
+if [[ -f .env ]] && grep -q '^CRON_SECRET=' .env; then
+  CRON_SECRET_VAL="$(grep '^CRON_SECRET=' .env | cut -d= -f2- | tr -d '"' | tr -d "'")"
+  if [[ -n "$CRON_SECRET_VAL" ]]; then
+    curl -fsS -H "Authorization: Bearer ${CRON_SECRET_VAL}" \
+      "http://127.0.0.1:${PORT}/api/cron/ping-feeds" && echo " Feed ping OK" || echo "WARN: feed ping failed"
+    curl -fsS -H "Authorization: Bearer ${CRON_SECRET_VAL}" \
+      "http://127.0.0.1:${PORT}/api/cron/index-run" && echo " Indexer run OK" || echo "WARN: indexer run failed"
+  fi
+fi
+
+echo ""
+echo "--- Indexer cron (every 5 min) ---"
+if [[ -f .env ]] && grep -q '^CRON_SECRET=' .env; then
+  CRON_SECRET_VAL="$(grep '^CRON_SECRET=' .env | cut -d= -f2- | tr -d '"' | tr -d "'")"
+  if [[ -n "$CRON_SECRET_VAL" ]]; then
+    mkdir -p logs
+    CRON_LINE="*/5 * * * * curl -fsS -H \"Authorization: Bearer ${CRON_SECRET_VAL}\" \"http://127.0.0.1:${PORT}/api/cron/index-run\" >> \"$(pwd)/logs/indexer-cron.log\" 2>&1"
+    (crontab -l 2>/dev/null | grep -v '/api/cron/index-run' || true; echo "$CRON_LINE") | crontab -
+    echo "Indexer cron installed."
+  else
+    echo "WARN: CRON_SECRET empty — set it in .env and re-run deploy."
+  fi
+else
+  echo "WARN: CRON_SECRET missing in .env — indexer queue will not auto-run."
+fi

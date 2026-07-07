@@ -13,7 +13,7 @@ export function slugifyTitle(title: string): string {
 }
 
 export async function uniqueSlug(base: string, excludeId?: string): Promise<string> {
-  let slug = slugifyTitle(base) || "post";
+  const slug = slugifyTitle(base) || "post";
   let suffix = 0;
 
   while (true) {

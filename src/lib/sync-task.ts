@@ -1,6 +1,5 @@
-import { normalizeApiStatus, statusBucket } from "@/lib/indexing-status";
-import { refundUrlIfEligible } from "@/lib/credits";
-import { getTaskStatus } from "@/lib/indexnowfast";
+import { refreshTaskAggregateStatus } from "@/lib/indexer/engine";
+import { processTask } from "@/lib/indexer/run";
 import { prisma } from "@/lib/prisma";
 
 export function normalizeUrl(url: string) {
@@ -21,58 +20,9 @@ export async function syncTaskFromProvider(taskId: string, userId: string) {
   });
 
   if (!task) return null;
-  if (!task.externalId) return task;
 
-  const remote = await getTaskStatus(task.externalId);
-  const urlMap = new Map(task.urls.map((u) => [normalizeUrl(u.url), u]));
-  const pendingRefunds: { taskUrlId: string; url: string }[] = [];
-
-  await prisma.$transaction(async (tx) => {
-    const providerRef = remote.task.provider_task_id
-      ? String(remote.task.provider_task_id)
-      : undefined;
-
-    await tx.task.update({
-      where: { id: task.id },
-      data: {
-        status: normalizeApiStatus(remote.task.status),
-        urlsCount: remote.task.urls_count ?? task.urlsCount,
-        creditsCharged: remote.task.credits_charged ?? task.creditsCharged,
-        tier: remote.task.tier ?? task.tier,
-        ...(providerRef ? { providerTaskId: providerRef } : {}),
-      },
-    });
-
-    for (const remoteUrl of remote.urls) {
-      let local = urlMap.get(normalizeUrl(remoteUrl.url));
-      if (!local) {
-        local = task.urls.find(
-          (u) => u.url.trim().toLowerCase() === remoteUrl.url.trim().toLowerCase(),
-        );
-      }
-      if (!local) continue;
-
-      const newStatus = normalizeApiStatus(remoteUrl.status);
-      const wasRefunded = statusBucket(local.status) === "refunded";
-      const isRefunded = statusBucket(newStatus) === "refunded";
-
-      if (isRefunded && !wasRefunded) {
-        pendingRefunds.push({ taskUrlId: local.id, url: local.url });
-      }
-
-      await tx.taskUrl.update({
-        where: { id: local.id },
-        data: {
-          status: newStatus,
-          indexedAt: remoteUrl.indexed_at ? new Date(remoteUrl.indexed_at) : null,
-        },
-      });
-    }
-  });
-
-  for (const item of pendingRefunds) {
-    await refundUrlIfEligible(userId, item.taskUrlId, item.url);
-  }
+  await processTask(task.id);
+  await refreshTaskAggregateStatus(task.id);
 
   return prisma.task.findUnique({
     where: { id: task.id },

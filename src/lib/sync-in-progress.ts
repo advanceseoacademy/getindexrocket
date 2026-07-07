@@ -4,7 +4,7 @@ import { syncTaskFromProvider } from "@/lib/sync-task";
 
 export async function syncInProgressTasks(userId: string, limit = 20) {
   const tasks = await prisma.task.findMany({
-    where: { userId, externalId: { not: null } },
+    where: { userId },
     include: { urls: true },
     orderBy: { createdAt: "desc" },
     take: 50,

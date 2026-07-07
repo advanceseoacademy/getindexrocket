@@ -2,7 +2,8 @@ export type DashboardPath =
   | "/dashboard"
   | "/tasks"
   | "/billing"
-  | "/settings";
+  | "/settings"
+  | "/support";
 
 export function navigateDashboard(href: DashboardPath) {
   if (window.location.pathname !== href) {

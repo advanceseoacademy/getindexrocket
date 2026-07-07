@@ -8,6 +8,7 @@ export const ADMIN_NAV_LINKS = [
   { href: "/admin/users", label: "Users", exact: false },
   { href: "/admin/payments", label: "Payments", exact: false },
   { href: "/admin/tasks", label: "Tasks", exact: false },
+  { href: "/admin/tickets", label: "Tickets", exact: false },
   { href: "/admin/credits", label: "Credits", exact: false },
   { href: "/admin/posts", label: "Blog", exact: false },
 ] as const;

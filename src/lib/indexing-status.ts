@@ -1,8 +1,7 @@
 /**
- * IndexNowFast status alignment.
+ * Indexing pipeline status alignment.
  *
- * Their API often returns `indexed` in JSON, but the dashboard UI labels
- * successful crawl verification as **CRAWLED**. We mirror the dashboard.
+ * Status buckets mirror honest discovery signals from our self-hosted indexer.
  */
 
 export type StatusBucket =
@@ -35,7 +34,7 @@ const BUCKET_META: Record<StatusBucket, StatusStyle> = {
   failed: { label: "FAILED", color: "#f87171", bg: "rgba(248,113,113,0.14)" },
 };
 
-/** Normalize IndexNowFast API status → stored/display bucket. */
+/** Normalize indexer status → stored/display bucket. */
 export function normalizeApiStatus(raw: string): string {
   const s = raw.toLowerCase().replace(/\s+/g, "_").trim();
   if (!s) return "pending";

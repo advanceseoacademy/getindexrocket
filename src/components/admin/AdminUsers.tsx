@@ -143,7 +143,7 @@ export function AdminUsers() {
   useEffect(() => {
     if (!selected) return;
     loadUserUrls(selected.id, urlPage, urlQuery);
-  }, [selected?.id, urlPage, urlQuery, loadUserUrls]);
+  }, [selected, urlPage, urlQuery, loadUserUrls]);
 
   async function patchUser(action: string, extra: Record<string, unknown> = {}) {
     if (!selected) return;

@@ -10,6 +10,8 @@
     "lint": "eslint",
     "db:backup": "node scripts/db-backup.mjs",
     "db:audit": "node scripts/db-audit.mjs",
+    "db:audit:indexer": "node scripts/db-audit-indexer.mjs",
+    "db:backfill:hubs": "node scripts/backfill-hub-tokens.mjs",
     "db:check": "node scripts/db-check-connection.mjs",
     "db:fix:credits-column": "node scripts/db-apply-intended-credits.mjs",
     "db:restore": "node scripts/db-restore.mjs",
@@ -18,6 +20,7 @@
     "db:push:force": "prisma db push",
     "db:migrate:deploy": "node scripts/db-migrate-deploy.mjs",
     "db:baseline": "node scripts/db-baseline.mjs",
+    "db:baseline:all": "node scripts/db-baseline-all.mjs",
     "db:google-auth": "node scripts/apply-google-auth-migration.mjs",
     "check:google-auth": "node scripts/check-google-auth.mjs",
     "google:origins": "node scripts/configure-google-origins.mjs",
@@ -25,7 +28,10 @@
     "db:migrate:sqlite": "node scripts/migrate-sqlite-to-supabase.mjs",
     "grant:credits": "node scripts/grant-credits.mjs",
     "admin:password": "node scripts/set-admin-password.mjs",
-    "icons:generate": "node scripts/generate-favicons.mjs"
+    "icons:generate": "node scripts/generate-favicons.mjs",
+    "prod:check": "node scripts/production-check.mjs",
+    "prod:ensure-env": "node scripts/ensure-indexer-env.mjs",
+    "prod:deploy": "powershell -File scripts/deploy-from-local.ps1"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-react": "^11.2.0",

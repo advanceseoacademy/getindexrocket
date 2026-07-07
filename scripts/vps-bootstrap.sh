@@ -41,7 +41,7 @@ fi
 bash scripts/vps-deploy.sh
 
 echo ""
-echo "Nginx: point $DOMAIN to http://127.0.0.1:3000"
+echo "Nginx: point $DOMAIN to http://127.0.0.1:3005"
 echo "Example location block:"
 cat <<'NGINX'
 
@@ -49,7 +49,7 @@ server {
     listen 80;
     server_name getindexrocket.com www.getindexrocket.com;
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:3005;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';

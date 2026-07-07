@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/tasks" as const, label: "My Tasks", prefetch: "/api/tasks" },
   { href: "/billing" as const, label: "Buy Credits", prefetch: null },
   { href: "/settings" as const, label: "Settings", prefetch: null },
+  { href: "/support" as const, label: "Support", prefetch: "/api/tickets" },
 ] as const;
 
 function isDashboardPath(path: string): path is DashboardPath {

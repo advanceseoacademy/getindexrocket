@@ -24,13 +24,13 @@ if (!database.trim()) {
 
 console.log("DIRECT_URL host check:", direct.replace(/:[^:@]+@/, ":***@"));
 
-function run(label, cmd, args) {
+function run(label, cmd, args, env = process.env) {
   console.log(`\n--- ${label} ---`);
   const result = spawnSync(cmd, args, {
     stdio: "inherit",
     shell: true,
     timeout: TIMEOUT_MS,
-    env: { ...process.env, PGCONNECT_TIMEOUT: "15" },
+    env,
   });
 
   if (result.error?.code === "ETIMEDOUT") {
@@ -41,7 +41,11 @@ function run(label, cmd, args) {
   return result.status === 0;
 }
 
-const ok = run("prisma migrate deploy", "npx", ["prisma", "migrate", "deploy"]);
+const ok = run("prisma migrate deploy", "npx", ["prisma", "migrate", "deploy"], {
+  ...process.env,
+  DATABASE_URL: direct,
+  PGCONNECT_TIMEOUT: "15",
+});
 
 if (!ok) {
   console.error(`

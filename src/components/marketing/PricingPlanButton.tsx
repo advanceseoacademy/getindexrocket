@@ -1,21 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 type PricingPlanButtonProps = {
   planId: string;
   label: string;
 };
 
-export function PricingPlanButton({ planId, label }: PricingPlanButtonProps) {
-  const [href, setHref] = useState(`/register?plan=${planId}`);
+function getSessionSnapshot() {
+  return typeof document !== "undefined" && document.cookie.includes("gir_session=");
+}
 
-  useEffect(() => {
-    if (document.cookie.includes("gir_session=")) {
-      setHref(`/billing?plan=${planId}`);
-    }
-  }, [planId]);
+function subscribeSession(onChange: () => void) {
+  if (typeof window === "undefined") return () => undefined;
+  const handler = () => onChange();
+  window.addEventListener("focus", handler);
+  return () => window.removeEventListener("focus", handler);
+}
+
+export function PricingPlanButton({ planId, label }: PricingPlanButtonProps) {
+  const loggedIn = useSyncExternalStore(subscribeSession, getSessionSnapshot, () => false);
+  const href = loggedIn ? `/billing?plan=${planId}` : `/register?plan=${planId}`;
 
   return (
     <Link

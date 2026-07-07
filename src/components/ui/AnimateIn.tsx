@@ -19,6 +19,13 @@ const VARIANT_CLASS: Record<RevealVariant, string> = {
   scale: "reveal-scale",
 };
 
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 type AnimateInProps = {
   children: ReactNode;
   className?: string;
@@ -37,16 +44,11 @@ export function AnimateIn({
   style,
 }: AnimateInProps) {
   const ref = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(prefersReducedMotion);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setVisible(true);
-      return;
-    }
+    if (!el || prefersReducedMotion()) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {

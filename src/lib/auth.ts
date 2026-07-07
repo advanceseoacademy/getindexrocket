@@ -179,8 +179,8 @@ export const getSessionUser = cache(async function getSessionUser(): Promise<Ses
   if (cached) {
     const payload = decodeUserCookie(cached);
     if (payload && Date.now() - payload.cachedAt < USER_CACHE_MS) {
-      const { cachedAt: _, ...user } = payload;
-      return user;
+      const { id, email, name, creditBalance, role } = payload;
+      return { id, email, name, creditBalance, role };
     }
   }
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
-import { computeReportStats, displayStatus, statusBucket } from "@/lib/indexing-status";
+import { computeReportStats, statusBucket } from "@/lib/indexing-status";
 import { prisma } from "@/lib/prisma";
 import { syncInProgressTasks } from "@/lib/sync-in-progress";
 import { serializeTask } from "@/lib/tasks-serialize";

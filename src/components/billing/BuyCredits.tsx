@@ -8,7 +8,7 @@ import {
   getBmcMembershipUrl,
   getBmcUsername,
 } from "@/lib/buymeacoffee-urls";
-import { BMC_MEMBERSHIP_URL, BMC_WEBHOOK_URL } from "@/lib/brand";
+import { BMC_MEMBERSHIP_URL } from "@/lib/brand";
 import { CREDIT_PLANS } from "@/lib/pricing-plans";
 
 type BuyCreditsProps = {

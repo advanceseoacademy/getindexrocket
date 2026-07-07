@@ -29,6 +29,8 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/tasks",
   "/billing",
   "/settings",
+  "/support",
   "/admin",
   "/admin/login",
+  "/feed/",
 ];

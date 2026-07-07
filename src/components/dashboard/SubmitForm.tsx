@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CREDIT_PER_URL } from "@/lib/brand";
 import { invalidateCache, invalidateDashboardCache } from "@/lib/client-cache";
+import { consumeResubmitUrls } from "@/lib/resubmit-urls";
 
 type SubmitFormProps = {
   creditBalance: number;
@@ -10,18 +11,10 @@ type SubmitFormProps = {
 
 export function SubmitForm({ creditBalance: initialBalance }: SubmitFormProps) {
   const [creditBalance, setCreditBalance] = useState(initialBalance);
-  const [urls, setUrls] = useState("");
+  const [urls, setUrls] = useState(consumeResubmitUrls);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  useEffect(() => {
-    const pending = sessionStorage.getItem("gir_resubmit_urls");
-    if (pending) {
-      setUrls(pending);
-      sessionStorage.removeItem("gir_resubmit_urls");
-    }
-  }, []);
 
   const urlCount = urls.split(/\r?\n/).filter((l) => l.trim().startsWith("http")).length;
   const cost = CREDIT_PER_URL * urlCount;

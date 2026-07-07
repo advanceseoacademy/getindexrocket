@@ -8,6 +8,7 @@ import { DashboardHome } from "@/components/dashboard/DashboardHome";
 import { IndexingReport } from "@/components/dashboard/IndexingReport";
 import { BillingLoader } from "@/components/billing/BillingLoader";
 import { SettingsContent } from "@/components/dashboard/SettingsContent";
+import { SupportContent } from "@/components/dashboard/SupportContent";
 import { useUser } from "@/components/dashboard/UserProvider";
 import { prefetch } from "@/lib/client-cache";
 
@@ -18,6 +19,7 @@ const DASHBOARD_PATHS: DashboardPath[] = [
   "/tasks",
   "/billing",
   "/settings",
+  "/support",
 ];
 
 const VIEW: Record<DashboardPath, () => ReactNode> = {
@@ -25,6 +27,7 @@ const VIEW: Record<DashboardPath, () => ReactNode> = {
   "/tasks": () => <IndexingReport />,
   "/billing": () => <BillingLoader />,
   "/settings": () => <SettingsContent />,
+  "/support": () => <SupportContent />,
 };
 
 function resolveDashboardPath(path: string): DashboardPath {
