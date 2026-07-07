@@ -27,7 +27,8 @@ export function getIndexNowKey(): string | null {
 export function getIndexNowKeyLocation(): string | null {
   const key = getIndexNowKey();
   if (!key) return null;
-  return `${getIndexerOrigin()}/indexnow/${key}.txt`;
+  // IndexNow: key at root covers all URLs on the host (hub pages are under /r/).
+  return `${getIndexerOrigin()}/${key}.txt`;
 }
 
 export function getCronSecret(): string | null {
