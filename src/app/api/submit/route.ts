@@ -125,22 +125,10 @@ export async function POST(request: Request) {
 
       const pipeline = await processTask(task.id);
 
-      if (pipeline.errors.length > 0 && pipeline.indexNowSubmitted === 0 && pipeline.bingSubmitted === 0 && pipeline.googleSubmitted === 0) {
-        await refundCredits(
-          auth.user.id,
-          creditCost,
-          "Indexing pipeline error — refund",
-        );
-        await prisma.task.update({
-          where: { id: task.id },
-          data: { status: "failed" },
-        });
-        return NextResponse.json(
-          { error: pipeline.errors[0] ?? "Indexing pipeline failed" },
-          { status: 502 },
-        );
-      }
-
+      // Discovery can fail transiently (API rate limit, network). The URLs stay
+      // queued with nextRunAt, and the cron retries every few minutes. Permanent
+      // failures are refunded automatically after REFUND_AFTER_DAYS. We must NOT
+      // refund here, otherwise the task keeps processing for free.
       if (pipeline.errors.length > 0) {
         await prisma.task.update({
           where: { id: task.id },
@@ -148,11 +136,16 @@ export async function POST(request: Request) {
         });
       }
     } catch (err) {
+      // Genuine failure creating/queuing the task — nothing is queued, so refund
+      // and remove the orphaned task to keep the ledger consistent.
       await refundCredits(
         auth.user.id,
         creditCost,
         "Indexing service error — refund",
       );
+      if (task?.id) {
+        await prisma.task.delete({ where: { id: task.id } }).catch(() => undefined);
+      }
       const message = err instanceof Error ? err.message : "Indexing service unavailable";
       return NextResponse.json({ error: message }, { status: 502 });
     }
