@@ -1,13 +1,14 @@
 "use client";
 
-import { computeTaskUrlStats } from "@/lib/indexing-status";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { SearchInput, StatusBadge } from "@/components/dashboard/dashboard-ui";
+import { computeReportStats, computeTaskUrlStats } from "@/lib/indexing-status";
 import type { SerializedTask } from "@/lib/tasks-serialize";
 import {
   formatTaskDate,
   formatTaskPublicId,
   formatUrlDate,
   getTaskDisplayBadge,
-  getUrlDisplayBadge,
   isProviderTaskComplete,
 } from "@/lib/task-ui";
 
@@ -19,63 +20,11 @@ type TaskDetailModalProps = {
   refreshing?: boolean;
 };
 
-function SearchIcon() {
+function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
-  );
-}
-
-function TaskHeaderBadge({ task, refreshing }: { task: SerializedTask; refreshing?: boolean }) {
-  const badge = getTaskDisplayBadge(task);
-  const processing = badge.processing;
-
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[11px] font-bold tracking-wide"
-      style={{ color: badge.color, background: badge.bg }}
-    >
-      {processing && (
-        <span className={refreshing ? "animate-pulse" : undefined}>
-          <SearchIcon />
-        </span>
-      )}
-      {badge.label}
-    </span>
-  );
-}
-
-function LinkStatusBadge({ url }: { url: SerializedTask["urls"][number] }) {
-  const badge = getUrlDisplayBadge(url);
-
-  return (
-    <span
-      className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wide"
-      style={{ color: badge.color, background: badge.bg }}
-    >
-      {badge.processing && <SearchIcon />}
-      {badge.label}
-    </span>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: number;
-  color: string;
-}) {
-  return (
-    <div className="rounded-xl border border-[var(--card-border)] bg-[var(--bg3)]/50 px-4 py-3 text-center">
-      <p className="text-[10px] font-semibold tracking-wider text-[var(--muted2)] uppercase">
-        {label}
-      </p>
-      <p className="mt-1 text-2xl font-bold" style={{ color }}>
+    <div className="rounded-xl border border-[var(--card-border)] bg-[var(--bg3)]/50 px-3 py-3 text-center sm:px-4">
+      <p className="text-[10px] font-semibold tracking-wider text-[var(--muted2)] uppercase">{label}</p>
+      <p className="stat-value mt-1 text-xl font-bold sm:text-2xl" style={{ color }}>
         {value}
       </p>
     </div>
@@ -89,79 +38,143 @@ export function TaskDetailModal({
   onExport,
   refreshing,
 }: TaskDetailModalProps) {
+  const [urlSearch, setUrlSearch] = useState("");
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!task) return;
+    setUrlSearch("");
+    closeBtnRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [task, onClose]);
+
+  const filteredUrls = useMemo(() => {
+    if (!task) return [];
+    const q = urlSearch.trim().toLowerCase();
+    if (!q) return task.urls;
+    return task.urls.filter((u) => u.url.toLowerCase().includes(q));
+  }, [task, urlSearch]);
+
   if (!task) return null;
 
   const stats = computeTaskUrlStats(task.urls);
+  const urlBreakdown = computeReportStats([{ urls: task.urls }]);
   const complete = isProviderTaskComplete(task);
+  const badge = getTaskDisplayBadge(task);
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4"
       onClick={onClose}
       role="presentation"
     >
       <div
-        className="max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-[var(--card-border)] bg-[var(--bg2)] shadow-xl"
+        className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl border border-[var(--card-border)] bg-[var(--bg2)] shadow-xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
+        aria-labelledby="task-detail-title"
       >
-        <div className="border-b border-[var(--card-border)] px-6 py-5">
-          <p className="text-xs text-[var(--muted)]">
-            Tasks / {formatTaskPublicId(task)}
-          </p>
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-xl font-bold">{task.urlsCount} URLs</h2>
-            <TaskHeaderBadge task={task} refreshing={refreshing} />
+        <div className="border-b border-[var(--card-border)] px-5 py-4 sm:px-6 sm:py-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs text-[var(--muted)]">Tasks / {formatTaskPublicId(task)}</p>
+              <h2 id="task-detail-title" className="mt-1 text-lg font-bold sm:text-xl">
+                {task.urlsCount} URL{task.urlsCount !== 1 ? "s" : ""}
+              </h2>
+            </div>
+            <button
+              ref={closeBtnRef}
+              type="button"
+              onClick={onClose}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--bg3)] hover:text-[var(--text)]"
+              aria-label="Close"
+            >
+              ×
+            </button>
           </div>
-          {!complete && (
-            <p className="mt-2 text-xs text-[var(--muted)]">
-              Indexing in progress — status updates automatically.
-            </p>
-          )}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold tracking-wide ${badge.processing ? "animate-pulse" : ""}`}
+              style={{ color: badge.color, background: badge.bg }}
+            >
+              {badge.label}
+            </span>
+            {!complete && (
+              <span className="text-xs text-[var(--muted)]">Updates automatically while processing</span>
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 px-6 py-4 sm:grid-cols-4">
-          <StatCard label="Total links" value={stats.total} color="var(--text)" />
+        <div className="grid grid-cols-2 gap-2 px-5 py-4 sm:grid-cols-4 sm:gap-3 sm:px-6">
+          <StatCard label="Total" value={stats.total} color="var(--text)" />
           <StatCard label="Crawled" value={stats.crawled} color="var(--success)" />
-          <StatCard label="Failed" value={stats.failed} color="var(--amber)" />
-          <StatCard label="Pending" value={stats.pending} color="var(--muted)" />
+          <StatCard label="Refunded" value={urlBreakdown.refunded} color="var(--amber)" />
+          <StatCard label="In progress" value={urlBreakdown.inProgress} color="var(--blue)" />
         </div>
 
-        <div className="flex items-center justify-between border-t border-b border-[var(--card-border)] px-6 py-3">
-          <h3 className="font-semibold">Links</h3>
-          <div className="flex gap-2">
+        <div className="flex flex-col gap-3 border-t border-b border-[var(--card-border)] px-5 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <h3 className="font-semibold">URLs</h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="w-full sm:w-48">
+              <SearchInput value={urlSearch} onChange={setUrlSearch} placeholder="Filter URLs…" />
+            </div>
             {onRefresh && (
               <button
                 type="button"
                 onClick={onRefresh}
                 disabled={refreshing}
-                className="rounded-lg border border-[var(--card-border)] px-3 py-1.5 text-xs text-[var(--muted)] hover:text-[var(--text)] disabled:opacity-50"
+                className="rounded-lg border border-[var(--card-border)] px-3 py-2 text-xs text-[var(--muted)] hover:text-[var(--text)] disabled:opacity-50"
               >
-                {refreshing ? "Checking…" : "Re-check status"}
+                {refreshing ? "Checking…" : "Re-check"}
               </button>
             )}
             {onExport && (
               <button
                 type="button"
                 onClick={onExport}
-                className="rounded-lg border border-[var(--card-border)] px-3 py-1.5 text-xs text-[var(--muted)] hover:text-[var(--text)]"
+                className="rounded-lg border border-[var(--card-border)] px-3 py-2 text-xs text-[var(--muted)] hover:text-[var(--text)]"
               >
-                Export CSV
+                CSV
               </button>
             )}
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-lg px-3 py-1.5 text-xs text-[var(--muted)] hover:text-[var(--text)]"
-            >
-              Close
-            </button>
           </div>
         </div>
 
-        <div className="max-h-[45vh] overflow-y-auto">
-          <table className="w-full text-sm">
+        <div className="flex-1 overflow-y-auto">
+          {/* Mobile URL cards */}
+          <div className="space-y-2 p-4 sm:hidden">
+            {filteredUrls.length === 0 ? (
+              <p className="py-6 text-center text-sm text-[var(--muted)]">No URLs match your search</p>
+            ) : (
+              filteredUrls.map((url) => (
+                <div
+                  key={url.id}
+                  className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-3"
+                >
+                  <StatusBadge status={url.status} />
+                  <a
+                    href={url.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 block break-all text-xs text-[var(--blue)] no-underline hover:underline"
+                  >
+                    {url.url}
+                  </a>
+                  <p className="mt-1 text-[10px] text-[var(--muted2)]">
+                    {formatUrlDate(url.indexedAt ?? task.createdAt)}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop table */}
+          <table className="hidden w-full text-sm sm:table">
             <thead className="sticky top-0 bg-[var(--bg2)]">
               <tr className="text-left text-[11px] font-semibold tracking-wider text-[var(--muted2)] uppercase">
                 <th className="px-6 py-3">URL</th>
@@ -170,32 +183,43 @@ export function TaskDetailModal({
               </tr>
             </thead>
             <tbody>
-              {task.urls.map((url) => (
-                <tr key={url.id} className="border-t border-[var(--card-border)]">
-                  <td className="max-w-[320px] truncate px-6 py-3.5 text-[var(--muted)]">
-                    <a
-                      href={url.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="no-underline hover:text-[var(--text)]"
-                    >
-                      {url.url}
-                    </a>
-                  </td>
-                  <td className="px-6 py-3.5">
-                    <LinkStatusBadge url={url} />
-                  </td>
-                  <td className="px-6 py-3.5 text-xs text-[var(--muted2)]">
-                    {formatUrlDate(url.indexedAt ?? task.createdAt)}
+              {filteredUrls.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="px-6 py-8 text-center text-sm text-[var(--muted)]">
+                    No URLs match your search
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredUrls.map((url) => (
+                  <tr key={url.id} className="border-t border-[var(--card-border)]">
+                    <td className="max-w-[320px] px-6 py-3.5">
+                      <a
+                        href={url.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block truncate text-[var(--muted)] no-underline hover:text-[var(--text)]"
+                      >
+                        {url.url}
+                      </a>
+                    </td>
+                    <td className="px-6 py-3.5">
+                      <StatusBadge status={url.status} />
+                    </td>
+                    <td className="px-6 py-3.5 text-xs text-[var(--muted2)]">
+                      {formatUrlDate(url.indexedAt ?? task.createdAt)}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
-        <p className="border-t border-[var(--card-border)] px-6 py-3 text-xs text-[var(--muted2)]">
-          Submitted {formatTaskDate(task.createdAt)} · Status synced automatically
+        <p className="border-t border-[var(--card-border)] px-5 py-3 text-xs text-[var(--muted2)] sm:px-6">
+          Submitted {formatTaskDate(task.createdAt)}
+          {filteredUrls.length !== task.urls.length && (
+            <> · Showing {filteredUrls.length} of {task.urls.length} URLs</>
+          )}
         </p>
       </div>
     </div>

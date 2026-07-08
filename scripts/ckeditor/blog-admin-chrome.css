@@ -1,0 +1,214 @@
+/* CKEditor 4 chrome overrides — loaded after default skin */
+
+.blog-rich-editor-ck4 a.cke_button,
+.blog-rich-editor-ck4 a.cke_combo_button,
+.blog-rich-editor-ck4 .cke_combo_open,
+.blog-rich-editor-ck4 .cke_toolbox_collapser,
+.blog-rich-editor-ck4 .cke_panel_listItem a,
+.blog-rich-editor-ck4 .cke_menubutton,
+.blog-rich-editor-ck4 .cke_dialog_ui_button,
+.blog-rich-editor-ck4 .cke_dialog_close,
+.blog-rich-editor-ck4 a.cke_colorbox,
+.blog-rich-editor-ck4 a.cke_colorauto,
+.blog-rich-editor-ck4 a.cke_colormore {
+  cursor: pointer !important;
+}
+
+.blog-rich-editor-ck4 a.cke_button_disabled,
+.blog-rich-editor-ck4 .cke_combo_disabled a.cke_combo_button {
+  cursor: not-allowed !important;
+}
+
+.blog-rich-editor-ck4 .cke_chrome {
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.blog-rich-editor-ck4 .cke_inner {
+  background: #0a1222 !important;
+}
+
+.blog-rich-editor-ck4 .cke_top {
+  background: linear-gradient(180deg, #111b2e 0%, #0f1a2e 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 10px 12px 6px !important;
+  box-shadow: none !important;
+}
+
+.blog-rich-editor-ck4 .cke_bottom {
+  background: #0f1a2e !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 4px 8px !important;
+}
+
+.blog-rich-editor-ck4 .cke_contents {
+  background: #0a1222 !important;
+  border: none !important;
+}
+
+.blog-rich-editor-ck4 .cke_wysiwyg_frame,
+.blog-rich-editor-ck4 .cke_wysiwyg_div {
+  background: #0a1222 !important;
+}
+
+.blog-rich-editor-ck4 .cke_toolbar {
+  margin-right: 4px;
+}
+
+.blog-rich-editor-ck4 .cke_toolgroup {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  margin: 0 6px 6px 0 !important;
+  padding: 2px 4px !important;
+  box-shadow: none !important;
+}
+
+.blog-rich-editor-ck4 .cke_toolgroup a.cke_button:last-child:after,
+.blog-rich-editor-ck4 .cke_combo:after {
+  display: none !important;
+}
+
+.blog-rich-editor-ck4 a.cke_button {
+  border: 0 !important;
+  border-radius: 8px !important;
+  padding: 5px 6px !important;
+  margin: 1px !important;
+  background: transparent !important;
+}
+
+.blog-rich-editor-ck4 a.cke_button_off:hover,
+.blog-rich-editor-ck4 a.cke_button_off:focus,
+.blog-rich-editor-ck4 a.cke_button_off:active {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 0 !important;
+  padding: 5px 6px !important;
+}
+
+.blog-rich-editor-ck4 a.cke_button_on {
+  background: rgba(255, 149, 0, 0.18) !important;
+  border: 0 !important;
+  padding: 5px 6px !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 149, 0, 0.35);
+}
+
+.blog-rich-editor-ck4 .cke_button_icon {
+  filter: brightness(0) invert(1) opacity(0.88);
+}
+
+.blog-rich-editor-ck4 a.cke_button_on .cke_button_icon,
+.blog-rich-editor-ck4 a.cke_button_off:hover .cke_button_icon {
+  filter: brightness(0) invert(1) opacity(1);
+}
+
+.blog-rich-editor-ck4 .cke_button_arrow {
+  border-top-color: #94a3b8 !important;
+}
+
+.blog-rich-editor-ck4 .cke_toolbar_separator {
+  background: rgba(255, 255, 255, 0.1) !important;
+  margin: 6px 4px 0 !important;
+  height: 20px !important;
+}
+
+.blog-rich-editor-ck4 a.cke_combo_button {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  margin: 0 6px 6px 0 !important;
+  padding: 2px 4px !important;
+}
+
+.blog-rich-editor-ck4 .cke_combo_on a.cke_combo_button,
+.blog-rich-editor-ck4 .cke_combo_off a.cke_combo_button:hover,
+.blog-rich-editor-ck4 .cke_combo_off a.cke_combo_button:focus,
+.blog-rich-editor-ck4 .cke_combo_off a.cke_combo_button:active {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.blog-rich-editor-ck4 .cke_combo_text {
+  color: #f0f4fa !important;
+  font-size: 12px !important;
+}
+
+.blog-rich-editor-ck4 .cke_combo_arrow {
+  border-top-color: #94a3b8 !important;
+}
+
+.blog-rich-editor-ck4 .cke_resizer {
+  border-color: transparent rgba(148, 163, 184, 0.7) transparent transparent !important;
+}
+
+.blog-rich-editor-ck4 textarea.cke_source {
+  background: #050810 !important;
+  color: #e2e8f0 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  padding: 14px 16px !important;
+}
+
+.blog-rich-editor-ck4 .cke_panel {
+  background: #0f1a2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45) !important;
+  z-index: 10050 !important;
+}
+
+.blog-rich-editor-ck4 .cke_panel_grouptitle {
+  background: #152238 !important;
+  color: #94a3b8 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.blog-rich-editor-ck4 .cke_panel_listItem a {
+  color: #f0f4fa !important;
+}
+
+.blog-rich-editor-ck4 .cke_panel_listItem a:hover,
+.blog-rich-editor-ck4 .cke_panel_listItem a:focus,
+.blog-rich-editor-ck4 .cke_panel_listItem a:active,
+.blog-rich-editor-ck4 .cke_panel_listItem.cke_selected a {
+  background: rgba(255, 149, 0, 0.15) !important;
+  outline: none !important;
+}
+
+.blog-rich-editor-ck4 .cke_dialog {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.blog-rich-editor-ck4 .cke_dialog_title,
+.blog-rich-editor-ck4 .cke_dialog_contents,
+.blog-rich-editor-ck4 .cke_dialog_footer {
+  background: #0f1a2e !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f0f4fa !important;
+}
+
+.blog-rich-editor-ck4 .cke_dialog input,
+.blog-rich-editor-ck4 .cke_dialog select,
+.blog-rich-editor-ck4 .cke_dialog textarea {
+  background: #0a1222 !important;
+  color: #f0f4fa !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+}
+
+.blog-rich-editor-ck4 .cke_dialog_ui_button {
+  border-radius: 8px !important;
+}
+
+.blog-rich-editor-ck4 .cke_dialog_ui_button_ok {
+  background: #ff9500 !important;
+  border-color: #ff9500 !important;
+  color: #1a0800 !important;
+}
+
+.blog-rich-editor-ck4 .cke_reset_all,
+.blog-rich-editor-ck4 .cke_reset_all * {
+  color: #f0f4fa;
+}

@@ -27,7 +27,7 @@ function MarkdownContent({ content }: { content: string }) {
 
         if (trimmed.startsWith("## ")) {
           return (
-            <h2 key={i} className="mt-8 text-lg font-semibold text-[var(--text)]">
+            <h2 key={i} className="section-title mt-10 text-[1.875rem] md:text-[2.25rem]">
               {renderInline(trimmed.slice(3))}
             </h2>
           );
@@ -35,7 +35,7 @@ function MarkdownContent({ content }: { content: string }) {
 
         if (trimmed.startsWith("### ")) {
           return (
-            <h3 key={i} className="mt-6 text-base font-semibold text-[var(--text)]">
+            <h3 key={i} className="mt-8 text-[1.5rem] font-bold tracking-tight text-[var(--text)] md:text-[1.875rem]">
               {renderInline(trimmed.slice(4))}
             </h3>
           );
@@ -66,14 +66,14 @@ export function BlogContent({ content }: { content: string }) {
   if (isHtmlContent(content)) {
     return (
       <div
-        className="blog-content-html space-y-4 text-sm leading-relaxed text-[var(--muted)]"
+        className="blog-content-html space-y-5 text-[var(--muted)]"
         dangerouslySetInnerHTML={{ __html: content }}
       />
     );
   }
 
   return (
-    <div className="blog-content space-y-4 text-sm leading-relaxed text-[var(--muted)]">
+    <div className="blog-content space-y-5 text-[var(--muted)]">
       <MarkdownContent content={content} />
     </div>
   );

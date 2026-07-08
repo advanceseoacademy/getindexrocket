@@ -5,7 +5,7 @@ import { CREDIT_PLANS } from "@/lib/pricing-plans";
 export { BreadcrumbJsonLd } from "./BreadcrumbJsonLd";
 export { LegalPageJsonLd } from "./LegalPageJsonLd";
 
-export function HomeJsonLd() {
+export function SiteSchemasJsonLd() {
   const organization = {
     "@type": "Organization",
     "@id": `${APP_URL}/#organization`,
@@ -50,6 +50,22 @@ export function HomeJsonLd() {
     publisher: { "@id": `${APP_URL}/#organization` },
   };
 
+  const graph = {
+    "@context": "https://schema.org",
+    "@graph": [organization, website, software],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
+    />
+  );
+}
+
+const FAQ_PREVIEW_COUNT = 4;
+
+export function HomeJsonLd() {
   const webPage = {
     "@type": "WebPage",
     "@id": `${APP_URL}/#webpage`,
@@ -65,7 +81,7 @@ export function HomeJsonLd() {
   const faqPage = {
     "@type": "FAQPage",
     "@id": `${APP_URL}/#faq`,
-    mainEntity: FAQ_ITEMS.map((item) => ({
+    mainEntity: FAQ_ITEMS.slice(0, FAQ_PREVIEW_COUNT).map((item) => ({
       "@type": "Question",
       name: item.q,
       acceptedAnswer: {
@@ -77,7 +93,7 @@ export function HomeJsonLd() {
 
   const graph = {
     "@context": "https://schema.org",
-    "@graph": [organization, website, software, webPage, faqPage],
+    "@graph": [webPage, faqPage],
   };
 
   return (

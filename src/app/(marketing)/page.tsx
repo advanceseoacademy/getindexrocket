@@ -2,10 +2,11 @@ import { HomeJsonLd } from "@/components/marketing/JsonLd";
 import { Hero } from "@/components/marketing/Hero";
 import { HomeSections } from "@/components/marketing/HomeSections";
 import { HomeSeoSection } from "@/components/marketing/HomeSeoSection";
+import { LivePlatformStats } from "@/components/marketing/trust/LivePlatformStats";
 import { APP_NAME } from "@/lib/brand";
 import { buildPageMetadata } from "@/lib/seo-metadata";
 
-export const dynamic = "force-static";
+export const revalidate = 60;
 
 export const metadata = buildPageMetadata({
   absoluteTitle: true,
@@ -25,11 +26,12 @@ export const metadata = buildPageMetadata({
   ],
 });
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <>
       <HomeJsonLd />
       <Hero />
+      <LivePlatformStats />
       <HomeSections />
       <HomeSeoSection />
     </>

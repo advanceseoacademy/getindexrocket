@@ -137,6 +137,7 @@ model BlogPost {
   slug            String    @unique
   title           String
   excerpt         String?
+  featuredImageUrl String?
   content         String    @db.Text
   metaTitle       String?
   metaDescription String?

@@ -4,10 +4,21 @@ import { requireAdmin } from "@/lib/auth";
 import { serializeBlogPost, uniqueSlug } from "@/lib/blog";
 import { prisma } from "@/lib/prisma";
 
+function normalizeFeaturedImageUrl(value: string | undefined) {
+  if (value === undefined) return undefined;
+  const trimmed = value.trim();
+  return trimmed || null;
+}
+
 const postFields = {
   title: z.string().min(1).max(200),
   slug: z.string().min(1).max(160).optional(),
   excerpt: z.string().max(500).optional(),
+  featuredImageUrl: z.union([
+    z.string().url().max(2048),
+    z.string().regex(/^\/[a-zA-Z0-9/_.-]+$/, "Invalid image path"),
+    z.literal(""),
+  ]).optional(),
   content: z.string().min(1),
   metaTitle: z.string().max(70).optional(),
   metaDescription: z.string().max(160).optional(),
@@ -75,12 +86,14 @@ export async function POST(request: NextRequest) {
   const slug = data.slug ? await uniqueSlug(data.slug) : await uniqueSlug(data.title);
   const status = data.status ?? "draft";
   const publishedAt = status === "published" ? new Date() : null;
+  const featuredImageUrl = normalizeFeaturedImageUrl(data.featuredImageUrl);
 
   const post = await prisma.blogPost.create({
     data: {
       title: data.title.trim(),
       slug,
       excerpt: data.excerpt?.trim() || null,
+      featuredImageUrl,
       content: data.content,
       metaTitle: data.metaTitle?.trim() || null,
       metaDescription: data.metaDescription?.trim() || null,

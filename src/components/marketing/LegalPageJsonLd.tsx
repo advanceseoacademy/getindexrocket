@@ -4,14 +4,16 @@ export function LegalPageJsonLd({
   path,
   name,
   description,
+  schemaType = "WebPage",
 }: {
   path: string;
   name: string;
   description: string;
+  schemaType?: "WebPage" | "PrivacyPolicy" | "TermsOfService";
 }) {
   const data = {
     "@context": "https://schema.org",
-    "@type": "WebPage",
+    "@type": schemaType,
     name,
     description,
     url: `${APP_URL}${path}`,

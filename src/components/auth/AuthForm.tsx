@@ -12,6 +12,9 @@ type AuthFormProps = {
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
+  const nextQuery = nextParam ? `?next=${encodeURIComponent(nextParam)}` : "";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -35,7 +38,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         return;
       }
       clearAuthClientCache();
-      const next = searchParams.get("next") ?? "/dashboard";
+      const next = nextParam ?? "/dashboard";
       router.push(next);
       router.refresh();
     } catch {
@@ -46,65 +49,84 @@ export function AuthForm({ mode }: AuthFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-4">
+    <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-4" aria-busy={loading}>
       {mode === "register" && (
         <div>
-          <label className="mb-1.5 block text-sm text-[var(--muted)]">Name</label>
+          <label htmlFor="auth-name" className="mb-1.5 block text-sm text-[var(--muted)]">
+            Name
+          </label>
           <input
+            id="auth-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-[10px] border border-[var(--card-border)] bg-[var(--bg2)] px-4 py-3 text-[var(--text)] outline-none focus:border-[var(--green)]"
+            autoComplete="name"
+            className="w-full rounded-[10px] border border-[var(--card-border)] bg-[var(--bg2)] px-4 py-3 text-[var(--text)] outline-none focus:border-[var(--green)] focus:ring-2 focus:ring-[var(--accent-12)]"
             placeholder="Your name"
           />
         </div>
       )}
       <div>
-        <label className="mb-1.5 block text-sm text-[var(--muted)]">Email</label>
+        <label htmlFor="auth-email" className="mb-1.5 block text-sm text-[var(--muted)]">
+          Email
+        </label>
         <input
+          id="auth-email"
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-[10px] border border-[var(--card-border)] bg-[var(--bg2)] px-4 py-3 text-[var(--text)] outline-none focus:border-[var(--green)]"
+          autoComplete="email"
+          aria-invalid={error ? true : undefined}
+          className="w-full rounded-[10px] border border-[var(--card-border)] bg-[var(--bg2)] px-4 py-3 text-[var(--text)] outline-none focus:border-[var(--green)] focus:ring-2 focus:ring-[var(--accent-12)]"
           placeholder="you@example.com"
         />
       </div>
       <div>
-        <label className="mb-1.5 block text-sm text-[var(--muted)]">Password</label>
+        <label htmlFor="auth-password" className="mb-1.5 block text-sm text-[var(--muted)]">
+          Password
+        </label>
         <input
+          id="auth-password"
           type="password"
           required
           minLength={6}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-[10px] border border-[var(--card-border)] bg-[var(--bg2)] px-4 py-3 text-[var(--text)] outline-none focus:border-[var(--green)]"
+          autoComplete={mode === "login" ? "current-password" : "new-password"}
+          aria-invalid={error ? true : undefined}
+          className="w-full rounded-[10px] border border-[var(--card-border)] bg-[var(--bg2)] px-4 py-3 text-[var(--text)] outline-none focus:border-[var(--green)] focus:ring-2 focus:ring-[var(--accent-12)]"
           placeholder="••••••••"
         />
       </div>
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && (
+        <p id="auth-error" role="alert" className="text-sm text-red-400">
+          {error}
+        </p>
+      )}
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-[10px] bg-[var(--green)] py-3 font-semibold text-[var(--on-accent)] disabled:opacity-60 btn-primary"
+        className="btn btn-primary btn-md btn-block"
+        aria-describedby={error ? "auth-error" : undefined}
       >
-        {loading ? "Please wait..." : mode === "login" ? "Sign in" : "Create account"}
+        {loading ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
       </button>
 
       <p className="text-center text-sm text-[var(--muted)]">
         {mode === "login" ? (
           <>
             No account?{" "}
-            <Link href="/register" className="text-[var(--green)] no-underline">
+            <Link href={`/register${nextQuery}`} className="text-[var(--green)] no-underline">
               Create account
             </Link>
           </>
         ) : (
           <>
             Already have an account?{" "}
-            <Link href="/login" className="text-[var(--green)] no-underline">
+            <Link href={`/login${nextQuery}`} className="text-[var(--green)] no-underline">
               Sign in
             </Link>
           </>

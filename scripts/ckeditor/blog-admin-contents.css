@@ -1,0 +1,104 @@
+body.blog-ck4-body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #f0f4fa;
+  background: #0a1222;
+  padding: 16px 20px;
+  margin: 0;
+}
+
+body.blog-ck4-body * {
+  font-family: inherit !important;
+  max-width: 100%;
+}
+
+body.blog-ck4-body p,
+body.blog-ck4-body li,
+body.blog-ck4-body td,
+body.blog-ck4-body th,
+body.blog-ck4-body span,
+body.blog-ck4-body font {
+  color: #f0f4fa !important;
+  background: transparent !important;
+}
+
+body.blog-ck4-body h1,
+body.blog-ck4-body h2,
+body.blog-ck4-body h3,
+body.blog-ck4-body h4 {
+  color: #f8fafc !important;
+  background: transparent !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+}
+
+body.blog-ck4-body h2 {
+  font-size: 1.4rem !important;
+  margin: 1.5rem 0 0.65rem;
+}
+
+body.blog-ck4-body h3 {
+  font-size: 1.15rem !important;
+  margin: 1.15rem 0 0.45rem;
+}
+
+body.blog-ck4-body p {
+  margin: 0 0 0.85rem;
+}
+
+body.blog-ck4-body ul,
+body.blog-ck4-body ol {
+  margin: 0 0 0.85rem 1.35rem;
+  padding: 0;
+}
+
+body.blog-ck4-body ul {
+  list-style: disc;
+}
+
+body.blog-ck4-body ol {
+  list-style: decimal;
+}
+
+body.blog-ck4-body blockquote {
+  border-left: 3px solid #ff9500;
+  padding: 0.25rem 0 0.25rem 1rem;
+  color: #94a3b8 !important;
+  margin: 0 0 0.85rem;
+}
+
+body.blog-ck4-body a {
+  color: #1aa3ff !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+body.blog-ck4-body a:hover {
+  color: #6ecfff !important;
+}
+
+body.blog-ck4-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+body.blog-ck4-body th,
+body.blog-ck4-body td {
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  padding: 0.55rem 0.8rem !important;
+  vertical-align: top;
+}
+
+body.blog-ck4-body th {
+  font-weight: 600 !important;
+  background: #152238 !important;
+  color: #f8fafc !important;
+}
+
+body.blog-ck4-body hr {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 1.25rem 0;
+}

@@ -10,60 +10,65 @@ type NavAuthClientProps = {
   isAdmin?: boolean;
 };
 
-type AuthState = "checking" | "guest" | "authed";
+type AuthState = "guest" | "authed";
 
 function hasAuthCookie() {
-  return typeof document !== "undefined" && document.cookie.includes("gir_auth=1");
+  return document.cookie.includes("gir_auth=1");
 }
 
-function readCreditsFromCache() {
+function readUserCache(): { creditBalance: number; isAdmin: boolean } | null {
   try {
     const raw = sessionStorage.getItem("gir_user_cache");
     if (!raw) return null;
-    const user = JSON.parse(raw) as { creditBalance?: number };
-    return user.creditBalance ?? null;
+    const user = JSON.parse(raw) as { creditBalance?: number; isAdmin?: boolean };
+    if (user.creditBalance == null) return null;
+    return { creditBalance: user.creditBalance, isAdmin: user.isAdmin === true };
   } catch {
     return null;
   }
 }
 
-function NavActionsSkeleton() {
-  return (
-    <div className="nav-actions flex min-h-10 min-w-[11.5rem] shrink-0 items-center justify-end gap-3 sm:min-w-[17rem]">
-      <span className="hidden h-4 w-20 animate-pulse rounded bg-[var(--bg3)] sm:inline" />
-      <span className="h-9 w-28 animate-pulse rounded-[10px] bg-[var(--bg3)]" />
-    </div>
-  );
-}
-
 export function NavAuthClient({ serverUser = null, isAdmin = false }: NavAuthClientProps) {
-  const [state, setState] = useState<AuthState>("checking");
+  // Always match server HTML on first paint — resolve auth only after mount.
+  const [state, setState] = useState<AuthState>("guest");
   const [credits, setCredits] = useState<number | null>(null);
   const [admin, setAdmin] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (serverUser) return;
+    if (serverUser) {
+      setReady(true);
+      return;
+    }
 
     let cancelled = false;
 
     async function resolveAuth() {
       if (!hasAuthCookie()) {
         clearAuthClientCache();
-        if (!cancelled) setState("guest");
+        if (!cancelled) {
+          setState("guest");
+          setReady(true);
+        }
         return;
       }
 
-      const cachedCredits = readCreditsFromCache();
-      if (cachedCredits != null && !cancelled) {
-        setCredits(cachedCredits);
+      const cached = readUserCache();
+      if (cached && !cancelled) {
+        setCredits(cached.creditBalance);
+        setAdmin(cached.isAdmin);
         setState("authed");
+        setReady(true);
       }
 
       try {
         const res = await fetch("/api/account", { credentials: "same-origin" });
         if (!res.ok) {
           clearAuthClientCache();
-          if (!cancelled) setState("guest");
+          if (!cancelled) {
+            setState("guest");
+            setReady(true);
+          }
           return;
         }
         const data = await res.json();
@@ -77,35 +82,26 @@ export function NavAuthClient({ serverUser = null, isAdmin = false }: NavAuthCli
           setState("guest");
         }
       } catch {
-        if (!cancelled) {
-          setAdmin(false);
-          setState(cachedCredits != null ? "authed" : "guest");
-        }
+        if (!cancelled && !cached) setState("guest");
+      } finally {
+        if (!cancelled) setReady(true);
       }
     }
 
-    resolveAuth();
+    void resolveAuth();
+
     return () => {
       cancelled = true;
     };
   }, [serverUser]);
 
   if (serverUser) {
-    return (
-      <NavLoggedInActions
-        creditBalance={serverUser.creditBalance}
-        isAdmin={isAdmin}
-      />
-    );
+    return <NavLoggedInActions creditBalance={serverUser.creditBalance} isAdmin={isAdmin} />;
   }
 
-  if (state === "authed") {
-    return <NavLoggedInActions creditBalance={credits} isAdmin={admin} />;
+  if (!ready || state === "guest") {
+    return <NavGuestActions />;
   }
 
-  if (state === "checking") {
-    return <NavActionsSkeleton />;
-  }
-
-  return <NavGuestActions />;
+  return <NavLoggedInActions creditBalance={credits} isAdmin={admin} />;
 }

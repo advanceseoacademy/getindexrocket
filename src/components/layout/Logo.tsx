@@ -29,6 +29,7 @@ export function Logo({ variant = "nav", linked = true, className = "" }: LogoPro
         height={height}
         className="h-full w-full object-contain object-left"
         priority={variant === "nav"}
+        fetchPriority={variant === "nav" ? "high" : undefined}
         sizes={`${width}px`}
       />
     </span>

@@ -1,5 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BreadcrumbJsonLd } from "@/components/marketing/BreadcrumbJsonLd";
+import { BlogItemListJsonLd } from "@/components/marketing/BlogItemListJsonLd";
+import { VisibleBreadcrumbs } from "@/components/marketing/VisibleBreadcrumbs";
+import { ButtonLink } from "@/components/ui/ButtonLink";
 import { APP_NAME } from "@/lib/brand";
 import { getPublishedPosts } from "@/lib/blog";
 import { buildPageMetadata } from "@/lib/seo-metadata";
@@ -39,7 +43,16 @@ export default async function BlogIndexPage() {
           { name: "Blog", path: "/blog" },
         ]}
       />
+      <BlogItemListJsonLd
+        posts={posts.map((p) => ({ slug: p.slug, title: p.title, publishedAt: p.publishedAt }))}
+      />
       <section className="site-container py-16">
+        <VisibleBreadcrumbs
+          items={[
+            { name: "Home", path: "/" },
+            { name: "Blog", path: "/blog" },
+          ]}
+        />
         <div className="max-w-3xl">
           <p className="text-sm font-medium text-[var(--accent)]">Blog</p>
           <h1 className="mt-2 text-3xl font-bold md:text-4xl">SEO &amp; indexing insights</h1>
@@ -50,16 +63,40 @@ export default async function BlogIndexPage() {
         </div>
 
         {posts.length === 0 ? (
-          <div className="mt-12 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-10 text-center text-[var(--muted)]">
-            No posts published yet. Check back soon.
+          <div className="mt-12 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-10 text-center">
+            <p className="text-[var(--muted)]">No posts published yet. Explore our guides in the meantime.</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <ButtonLink href="/how-it-works" variant="ghost">
+                How it works
+              </ButtonLink>
+              <ButtonLink href="/faq" variant="ghost">
+                FAQ
+              </ButtonLink>
+              <ButtonLink href="/register">Create account</ButtonLink>
+            </div>
           </div>
         ) : (
           <div className="mt-12 grid gap-6">
             {posts.map((post) => (
               <article
                 key={post.id}
-                className="hover-lift rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6"
+                className="hover-lift overflow-hidden rounded-2xl border border-[var(--card-border)] bg-[var(--card)]"
               >
+                {post.featuredImageUrl ? (
+                  <Link href={`/blog/${post.slug}`} className="block no-underline">
+                    <div className="relative aspect-[1200/630] w-full">
+                      <Image
+                        src={post.featuredImageUrl}
+                        alt={post.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 768px"
+                        unoptimized={post.featuredImageUrl.startsWith("http")}
+                      />
+                    </div>
+                  </Link>
+                ) : null}
+                <div className="p-6">
                 <time
                   dateTime={post.publishedAt?.toISOString()}
                   className="text-xs text-[var(--muted2)]"
@@ -82,6 +119,7 @@ export default async function BlogIndexPage() {
                 >
                   Read more →
                 </Link>
+                </div>
               </article>
             ))}
           </div>

@@ -4,12 +4,24 @@ import { requireAdmin } from "@/lib/auth";
 import { serializeBlogPost, uniqueSlug } from "@/lib/blog";
 import { prisma } from "@/lib/prisma";
 
+function normalizeFeaturedImageUrl(value: string | null | undefined) {
+  if (value === undefined) return undefined;
+  const trimmed = value?.trim() ?? "";
+  return trimmed || null;
+}
+
 type RouteContext = { params: Promise<{ id: string }> };
+
+const featuredImageSchema = z
+  .union([z.string().url().max(2048), z.string().regex(/^\/[a-zA-Z0-9/_.-]+$/, "Invalid image path"), z.literal("")])
+  .optional()
+  .nullable();
 
 const updatePostSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   slug: z.string().min(1).max(160).optional(),
   excerpt: z.string().max(500).optional().nullable(),
+  featuredImageUrl: featuredImageSchema,
   content: z.string().min(1).optional(),
   metaTitle: z.string().max(70).optional().nullable(),
   metaDescription: z.string().max(160).optional().nullable(),
@@ -75,6 +87,9 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       ...(data.title !== undefined ? { title: data.title.trim() } : {}),
       slug,
       ...(data.excerpt !== undefined ? { excerpt: data.excerpt?.trim() || null } : {}),
+      ...(data.featuredImageUrl !== undefined
+        ? { featuredImageUrl: normalizeFeaturedImageUrl(data.featuredImageUrl) }
+        : {}),
       ...(data.content !== undefined ? { content: data.content } : {}),
       ...(data.metaTitle !== undefined ? { metaTitle: data.metaTitle?.trim() || null } : {}),
       ...(data.metaDescription !== undefined

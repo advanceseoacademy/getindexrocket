@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AdminBadge,
   AdminLoading,
@@ -28,6 +28,7 @@ type PostRow = {
   slug: string;
   title: string;
   excerpt: string | null;
+  featuredImageUrl: string | null;
   content: string;
   metaTitle: string | null;
   metaDescription: string | null;
@@ -43,6 +44,7 @@ const EMPTY_FORM = {
   title: "",
   slug: "",
   excerpt: "",
+  featuredImageUrl: "",
   content: "",
   metaTitle: "",
   metaDescription: "",
@@ -52,6 +54,27 @@ const EMPTY_FORM = {
 
 function isEditorContentEmpty(html: string) {
   return !html.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").trim();
+}
+
+function postToForm(post: PostRow) {
+  return {
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt ?? "",
+    featuredImageUrl: post.featuredImageUrl ?? "",
+    content: post.content,
+    metaTitle: post.metaTitle ?? "",
+    metaDescription: post.metaDescription ?? "",
+    metaKeywords: post.metaKeywords ?? "",
+    status: post.status === "published" ? ("published" as const) : ("draft" as const),
+  };
+}
+
+function scrollToEditor(node: HTMLDivElement | null) {
+  if (!node) return;
+  requestAnimationFrame(() => {
+    node.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 export function AdminPosts() {
@@ -66,8 +89,11 @@ export function AdminPosts() {
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [loadingEditor, setLoadingEditor] = useState(false);
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
+  const editorRef = useRef<HTMLDivElement>(null);
 
   const loadPosts = useCallback(async () => {
     setLoading(true);
@@ -104,27 +130,32 @@ export function AdminPosts() {
   }
 
   async function startEdit(id: string) {
+    const cached = posts.find((p) => p.id === id);
     setCreating(false);
     setEditingId(id);
     setMsg("");
     setErr("");
-    const res = await fetch(`/api/admin/posts/${id}`);
-    const data = await res.json();
-    if (!res.ok) {
-      setErr(data.error ?? "Failed to load post");
-      return;
+
+    if (cached) {
+      setForm(postToForm(cached));
+    } else {
+      setLoadingEditor(true);
     }
-    const post = data.post as PostRow;
-    setForm({
-      title: post.title,
-      slug: post.slug,
-      excerpt: post.excerpt ?? "",
-      content: post.content,
-      metaTitle: post.metaTitle ?? "",
-      metaDescription: post.metaDescription ?? "",
-      metaKeywords: post.metaKeywords ?? "",
-      status: post.status === "published" ? "published" : "draft",
-    });
+
+    try {
+      const res = await fetch(`/api/admin/posts/${id}`);
+      const data = await res.json();
+      if (!res.ok) {
+        setErr(data.error ?? "Failed to load post");
+        if (!cached) {
+          setEditingId(null);
+        }
+        return;
+      }
+      setForm(postToForm(data.post as PostRow));
+    } finally {
+      setLoadingEditor(false);
+    }
   }
 
   function closeEditor() {
@@ -170,6 +201,7 @@ export function AdminPosts() {
       title: data.post.title,
       slug: data.post.slug,
       excerpt: data.post.excerpt ?? "",
+      featuredImageUrl: data.post.featuredImageUrl ?? "",
       content: data.post.content,
       metaTitle: data.post.metaTitle ?? "",
       metaDescription: data.post.metaDescription ?? "",
@@ -179,6 +211,24 @@ export function AdminPosts() {
     setEditingId(data.post.id);
     setCreating(false);
     await loadPosts();
+  }
+
+  async function uploadFeaturedImage(file: File) {
+    setUploadingImage(true);
+    setErr("");
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/blog-image", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) {
+        setErr(data.error ?? "Image upload failed");
+        return;
+      }
+      setForm((f) => ({ ...f, featuredImageUrl: data.url }));
+    } finally {
+      setUploadingImage(false);
+    }
   }
 
   async function deletePost() {
@@ -196,31 +246,24 @@ export function AdminPosts() {
     await loadPosts();
   }
 
+  useEffect(() => {
+    if (creating || editingId) {
+      scrollToEditor(editorRef.current);
+    }
+  }, [creating, editingId]);
+
   const showEditor = creating || editingId;
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Blog posts</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            Create, publish, and manage SEO-friendly blog content
-          </p>
-        </div>
-        {!showEditor ? (
-          <button
-            type="button"
-            onClick={startCreate}
-            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)]"
-          >
-            + New post
-          </button>
-        ) : null}
-      </div>
-
-      {showEditor ? (
+  function renderEditorPanel() {
+    return (
+      <div ref={editorRef}>
         <AdminPanel title={creating ? "New post" : "Edit post"}>
-          <div className="space-y-5 p-5">
+          {loadingEditor ? (
+            <div className="p-8">
+              <AdminLoading />
+            </div>
+          ) : (
+            <div className="space-y-5 p-5">
             <div className="grid gap-4 md:grid-cols-2">
               <label className="block text-sm">
                 <span className="mb-1 block text-[var(--muted)]">Title *</span>
@@ -251,13 +294,64 @@ export function AdminPosts() {
               />
             </label>
 
+            <div className="rounded-xl border border-[var(--card-border)] bg-[var(--bg2)] p-4">
+              <p className="mb-3 text-sm font-semibold">Featured image</p>
+              {form.featuredImageUrl ? (
+                <div className="mb-4 overflow-hidden rounded-lg border border-[var(--card-border)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={form.featuredImageUrl}
+                    alt="Featured preview"
+                    className="max-h-56 w-full object-cover"
+                  />
+                </div>
+              ) : (
+                <p className="mb-3 text-xs text-[var(--muted)]">
+                  Shown on the blog list and at the top of the post. Recommended 1200×630 or wider.
+                </p>
+              )}
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="cursor-pointer rounded-lg border border-[var(--card-border)] bg-[var(--bg3)] px-4 py-2 text-sm hover:border-[var(--accent)]">
+                  {uploadingImage ? "Uploading…" : "Upload image"}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="sr-only"
+                    disabled={uploadingImage || saving}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void uploadFeaturedImage(file);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                {form.featuredImageUrl ? (
+                  <button
+                    type="button"
+                    onClick={() => setForm((f) => ({ ...f, featuredImageUrl: "" }))}
+                    className="text-sm text-[#f87171]"
+                  >
+                    Remove
+                  </button>
+                ) : null}
+              </div>
+              <label className="mt-4 block text-sm">
+                <span className="mb-1 block text-[var(--muted)]">Or paste image URL</span>
+                <input
+                  value={form.featuredImageUrl}
+                  onChange={(e) => setForm((f) => ({ ...f, featuredImageUrl: e.target.value }))}
+                  placeholder="https://… or /blog/your-image.jpg"
+                  className="w-full rounded-lg border border-[var(--card-border)] bg-[var(--bg3)] px-3 py-2"
+                />
+              </label>
+            </div>
+
             <div className="block text-sm">
               <span className="mb-2 block text-[var(--muted)]">Content *</span>
               <BlogRichEditor
                 key={editingId ?? "new"}
                 value={form.content}
                 onChange={(html) => setForm((f) => ({ ...f, content: html }))}
-                placeholder="Write your blog post with headings, lists, links, and formatting…"
               />
             </div>
 
@@ -338,9 +432,34 @@ export function AdminPosts() {
                 Cancel
               </button>
             </div>
-          </div>
+            </div>
+          )}
         </AdminPanel>
-      ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Blog posts</h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            Create, publish, and manage SEO-friendly blog content
+          </p>
+        </div>
+        {!showEditor ? (
+          <button
+            type="button"
+            onClick={startCreate}
+            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)]"
+          >
+            + New post
+          </button>
+        ) : null}
+      </div>
+
+      {creating ? renderEditorPanel() : null}
 
       <AdminPanel
         title="All posts"
@@ -421,6 +540,8 @@ export function AdminPosts() {
           </>
         )}
       </AdminPanel>
+
+      {editingId ? renderEditorPanel() : null}
     </div>
   );
 }

@@ -211,6 +211,7 @@ export function SupportContent() {
                   <button
                     type="button"
                     onClick={() => {
+                      setSelected(null);
                       setView("detail");
                       void loadTicket(ticket.id);
                     }}

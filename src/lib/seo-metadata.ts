@@ -36,11 +36,13 @@ export function buildPageMetadata({
       url: canonical,
       siteName: APP_NAME,
       locale: "en_US",
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${APP_NAME} preview` }],
     },
     twitter: {
       card: "summary_large_image",
       title: ogTitle,
       description,
+      images: ["/opengraph-image"],
     },
   };
 
@@ -87,9 +89,11 @@ export const SITE_METADATA: Metadata = {
     locale: "en_US",
     siteName: APP_NAME,
     url: APP_URL,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${APP_NAME} preview` }],
   },
   twitter: {
     card: "summary_large_image",
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,

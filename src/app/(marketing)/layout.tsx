@@ -1,13 +1,7 @@
-import { Suspense } from "react";
 import { Footer } from "@/components/layout/Footer";
 import { Nav } from "@/components/layout/Nav";
-import { NavWithSession } from "@/components/layout/NavWithSession";
-
-export const dynamic = "force-dynamic";
-
-function NavFallback() {
-  return <Nav user={null} />;
-}
+import { SiteSchemasJsonLd } from "@/components/marketing/JsonLd";
+import { SupportChatbot } from "@/components/marketing/SupportChatbot";
 
 export default function MarketingLayout({
   children,
@@ -16,13 +10,13 @@ export default function MarketingLayout({
 }) {
   return (
     <div className="flex min-h-full flex-col">
-      <Suspense fallback={<NavFallback />}>
-        <NavWithSession />
-      </Suspense>
+      <SiteSchemasJsonLd />
+      <Nav user={null} />
       <main id="main-content" className="flex-1">
         {children}
       </main>
       <Footer />
+      <SupportChatbot />
     </div>
   );
 }

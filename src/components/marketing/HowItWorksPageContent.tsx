@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { AnimateIn } from "@/components/ui/AnimateIn";
+import { ButtonLink } from "@/components/ui/ButtonLink";
 import { APP_NAME } from "@/lib/brand";
 import { BACKLINK_INDEXING_FAQ, HOW_IT_WORKS_STEPS } from "@/lib/seo-content";
 
 export function HowItWorksPageContent() {
   return (
-    <article className="site-container py-16">
+    <article className="site-container section-pad">
       <AnimateIn>
-        <h1 className="text-3xl font-bold md:text-4xl">
-          How {APP_NAME} Backlink Indexing Works
-        </h1>
-        <p className="mt-4 max-w-3xl text-base leading-relaxed text-[var(--muted)]">
+        <p className="eyebrow">How it works</p>
+        <h1 className="text-display max-w-4xl">How {APP_NAME} Backlink Indexing Works</h1>
+        <p className="text-lead mt-5 max-w-3xl">
           A transparent five-step pipeline from URL submission to crawl verification. You always
           know what happened, what is in progress, and when credits are refunded.
         </p>
@@ -19,8 +19,8 @@ export function HowItWorksPageContent() {
       <ol className="mt-12 space-y-6">
         {HOW_IT_WORKS_STEPS.map((s, i) => (
           <AnimateIn key={s.step} delay={i * 60}>
-            <li className="hover-lift flex gap-6 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--accent-12)] text-lg font-bold text-[var(--green)]">
+            <li className="ui-card hover-lift flex gap-6">
+              <span className="icon-box icon-box-lg shrink-0 font-bold text-[var(--green)]">
                 {s.step}
               </span>
               <div>
@@ -55,20 +55,17 @@ export function HowItWorksPageContent() {
         </div>
       </section>
 
-      <AnimateIn className="mt-12 rounded-2xl border border-[var(--accent-25)] bg-[var(--accent-06)] p-8 text-center">
+      <AnimateIn className="mt-12 ui-card ui-card-accent p-8 text-center">
         <h2 className="text-xl font-bold">Ready to submit your first URL?</h2>
-        <p className="mx-auto mt-3 max-w-lg text-sm text-[var(--muted)]">
+        <p className="section-desc mx-auto mt-3 max-w-lg">
           1 credit = 1 URL. Automatic refund if crawl fails.{" "}
-          <Link href="/refund-policy" className="text-[var(--green)] no-underline hover:underline">
+          <Link href="/refund-policy" className="text-link">
             Read refund policy
           </Link>
         </p>
-        <Link
-          href="/register"
-          className="btn-primary mt-6 inline-flex rounded-[10px] bg-[var(--green)] px-8 py-3.5 font-semibold text-[var(--on-accent)] no-underline"
-        >
+        <ButtonLink href="/register" className="mt-6">
           Create free account
-        </Link>
+        </ButtonLink>
       </AnimateIn>
     </article>
   );

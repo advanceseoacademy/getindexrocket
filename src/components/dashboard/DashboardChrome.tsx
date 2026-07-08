@@ -9,6 +9,7 @@ import { IndexingReport } from "@/components/dashboard/IndexingReport";
 import { BillingLoader } from "@/components/billing/BillingLoader";
 import { SettingsContent } from "@/components/dashboard/SettingsContent";
 import { SupportContent } from "@/components/dashboard/SupportContent";
+import { DashboardMobileNav } from "@/components/dashboard/DashboardMobileNav";
 import { useUser } from "@/components/dashboard/UserProvider";
 import { prefetch } from "@/lib/client-cache";
 
@@ -66,7 +67,7 @@ export function DashboardChrome() {
 
   const initialPath = resolveDashboardPath(routerPathname);
   const [activePath, setActivePath] = useState<DashboardPath>(initialPath);
-  const [mounted, setMounted] = useState<Set<DashboardPath>>(() => new Set([initialPath]));
+  const [mounted, setMounted] = useState<Set<DashboardPath>>(() => new Set(DASHBOARD_PATHS));
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -97,7 +98,10 @@ export function DashboardChrome() {
         setActivePath("/dashboard");
         return;
       }
-      if (isDashboardPath(path)) setActivePath(path);
+      if (isDashboardPath(path)) {
+        setActivePath(path);
+        setMounted((prev) => new Set(prev).add(path));
+      }
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
@@ -106,6 +110,8 @@ export function DashboardChrome() {
   useEffect(() => {
     prefetch("/api/dashboard?skipSync=1");
     prefetch("/api/tasks?skipSync=1");
+    prefetch("/api/account");
+    prefetch("/api/tickets");
   }, []);
 
   useEffect(() => {
@@ -130,7 +136,7 @@ export function DashboardChrome() {
       <Nav user={user} showDashboardNav />
       <main
         id="main-content"
-        className="site-container flex-1 py-10 animate-page-in"
+        className="site-container flex-1 py-10 pb-24 md:pb-10"
       >
         {Array.from(mounted).map((path) => {
           const View = VIEW[path];
@@ -142,6 +148,7 @@ export function DashboardChrome() {
           );
         })}
       </main>
+      <DashboardMobileNav />
     </>
   );
 }

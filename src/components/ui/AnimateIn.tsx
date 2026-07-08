@@ -1,30 +1,14 @@
-"use client";
-
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ElementType,
-  type ReactNode,
-} from "react";
+import type { CSSProperties, ElementType, ReactNode } from "react";
 
 type RevealVariant = "fade-up" | "fade-in" | "slide-right" | "slide-left" | "scale";
 
 const VARIANT_CLASS: Record<RevealVariant, string> = {
-  "fade-up": "reveal-fade-up",
-  "fade-in": "reveal-fade-in",
-  "slide-right": "reveal-slide-right",
-  "slide-left": "reveal-slide-left",
-  scale: "reveal-scale",
+  "fade-up": "reveal-css-fade-up",
+  "fade-in": "reveal-css-fade-in",
+  "slide-right": "reveal-css-slide-right",
+  "slide-left": "reveal-css-slide-left",
+  scale: "reveal-css-scale",
 };
-
-function prefersReducedMotion() {
-  return (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-}
 
 type AnimateInProps = {
   children: ReactNode;
@@ -35,6 +19,7 @@ type AnimateInProps = {
   style?: CSSProperties;
 };
 
+/** CSS-only scroll reveal — no client JavaScript (better LCP/INP). */
 export function AnimateIn({
   children,
   className = "",
@@ -43,32 +28,10 @@ export function AnimateIn({
   as: Component = "div",
   style,
 }: AnimateInProps) {
-  const ref = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(prefersReducedMotion);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || prefersReducedMotion()) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -32px 0px" },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <Component
-      ref={ref}
-      className={`reveal ${VARIANT_CLASS[variant]} ${visible ? "reveal-visible" : ""} ${className}`.trim()}
-      style={{ ...style, transitionDelay: `${delay}ms` }}
+      className={`reveal-css ${VARIANT_CLASS[variant]} ${className}`.trim()}
+      style={{ ...style, "--reveal-delay": `${delay}ms` } as CSSProperties}
     >
       {children}
     </Component>

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { APP_URL } from "@/lib/brand";
 
 export type BlogPostStatus = "draft" | "published";
 
@@ -36,11 +37,20 @@ export function parseMetaKeywords(raw: string | null | undefined): string[] | un
   return keywords.length ? keywords : undefined;
 }
 
+export function resolveBlogImageUrl(url: string | null | undefined): string | null {
+  if (!url?.trim()) return null;
+  const trimmed = url.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (trimmed.startsWith("/")) return `${APP_URL}${trimmed}`;
+  return `${APP_URL}/${trimmed}`;
+}
+
 export function serializeBlogPost(post: {
   id: string;
   slug: string;
   title: string;
   excerpt: string | null;
+  featuredImageUrl?: string | null;
   content: string;
   metaTitle: string | null;
   metaDescription: string | null;
@@ -57,6 +67,7 @@ export function serializeBlogPost(post: {
     slug: post.slug,
     title: post.title,
     excerpt: post.excerpt,
+    featuredImageUrl: post.featuredImageUrl ?? null,
     content: post.content,
     metaTitle: post.metaTitle,
     metaDescription: post.metaDescription,
@@ -81,6 +92,7 @@ export async function getPublishedPosts(limit?: number) {
         slug: true,
         title: true,
         excerpt: true,
+        featuredImageUrl: true,
         metaDescription: true,
         publishedAt: true,
         updatedAt: true,

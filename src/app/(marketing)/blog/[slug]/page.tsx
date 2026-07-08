@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleJsonLd } from "@/components/marketing/ArticleJsonLd";
 import { BlogContent } from "@/components/marketing/BlogContent";
 import { BreadcrumbJsonLd } from "@/components/marketing/BreadcrumbJsonLd";
 import { APP_NAME } from "@/lib/brand";
-import { getPublishedPostBySlug, parseMetaKeywords } from "@/lib/blog";
+import { getPublishedPostBySlug, parseMetaKeywords, resolveBlogImageUrl } from "@/lib/blog";
 import { buildPageMetadata } from "@/lib/seo-metadata";
 import { prisma } from "@/lib/prisma";
 
@@ -51,6 +52,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     keywords: parseMetaKeywords(post.metaKeywords),
   });
 
+  const featuredImage = resolveBlogImageUrl(post.featuredImageUrl);
+
   return {
     ...metadata,
     openGraph: {
@@ -58,7 +61,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: "article",
       publishedTime: post.publishedAt?.toISOString(),
       modifiedTime: post.updatedAt.toISOString(),
+      ...(featuredImage
+        ? {
+            images: [{ url: featuredImage, width: 1200, height: 630, alt: post.title }],
+          }
+        : {}),
     },
+    ...(featuredImage
+      ? {
+          twitter: {
+            ...metadata.twitter,
+            images: [featuredImage],
+          },
+        }
+      : {}),
   };
 }
 
@@ -82,6 +98,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     `${post.title} — ${APP_NAME} blog on backlink indexing and SEO.`;
   const authorName = post.author?.name ?? post.author?.email ?? APP_NAME;
   const publishedAt = post.publishedAt ?? post.createdAt;
+  const featuredImage = post.featuredImageUrl;
 
   return (
     <>
@@ -99,6 +116,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         publishedAt={publishedAt.toISOString()}
         updatedAt={post.updatedAt.toISOString()}
         authorName={authorName}
+        imageUrl={resolveBlogImageUrl(post.featuredImageUrl) ?? undefined}
       />
       <article className="site-container py-16">
         <div className="mx-auto max-w-3xl">
@@ -118,6 +136,19 @@ export default async function BlogPostPage({ params }: PageProps) {
             ) : null}
             <p className="mt-4 text-xs text-[var(--muted2)]">By {authorName}</p>
           </header>
+          {featuredImage ? (
+            <div className="relative mt-8 aspect-[1200/630] overflow-hidden rounded-2xl border border-[var(--card-border)]">
+              <Image
+                src={featuredImage}
+                alt={post.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 768px"
+                priority
+                unoptimized={featuredImage.startsWith("http")}
+              />
+            </div>
+          ) : null}
           <div className="mt-8">
             <BlogContent content={post.content} />
           </div>

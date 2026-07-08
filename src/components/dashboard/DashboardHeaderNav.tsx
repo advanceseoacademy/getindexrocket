@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { prefetch } from "@/lib/client-cache";
 import { navigateDashboard, type DashboardPath } from "@/lib/dashboard-nav";
 
-const LINKS = [
+export const DASHBOARD_NAV_LINKS = [
   { href: "/dashboard" as const, label: "Dashboard", prefetch: "/api/dashboard?skipSync=1" },
   { href: "/tasks" as const, label: "My Tasks", prefetch: "/api/tasks" },
   { href: "/billing" as const, label: "Buy Credits", prefetch: null },
@@ -15,7 +14,7 @@ const LINKS = [
 ] as const;
 
 function isDashboardPath(path: string): path is DashboardPath {
-  return LINKS.some((link) => link.href === path);
+  return DASHBOARD_NAV_LINKS.some((link) => link.href === path);
 }
 
 export function DashboardHeaderNav() {
@@ -44,13 +43,13 @@ export function DashboardHeaderNav() {
 
   return (
     <nav className="hidden items-center gap-2 md:flex" aria-label="Dashboard navigation">
-      <Link
+      <a
         href="/"
         className="rounded-lg px-3 py-1.5 text-sm text-[var(--muted)] no-underline hover:text-[var(--text)]"
       >
         Home
-      </Link>
-      {LINKS.map((link) => {
+      </a>
+      {DASHBOARD_NAV_LINKS.map((link) => {
         const active = activePath === link.href;
         return (
           <button
@@ -60,6 +59,7 @@ export function DashboardHeaderNav() {
               if (link.prefetch) prefetch(link.prefetch);
             }}
             onClick={() => navigateDashboard(link.href)}
+            aria-current={active ? "page" : undefined}
             className={`rounded-lg px-3 py-1.5 text-sm ${
               active
                 ? "bg-[var(--accent)] font-medium text-[var(--on-accent)]"

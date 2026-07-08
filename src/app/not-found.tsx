@@ -1,15 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/layout/Footer";
 import { Nav } from "@/components/layout/Nav";
 import { APP_NAME } from "@/lib/brand";
-import { buildPrivatePageMetadata } from "@/lib/seo-metadata";
 
-export const metadata = buildPrivatePageMetadata({
+export const metadata: Metadata = {
   title: "Page not found",
   description: "The page you requested could not be found.",
-  path: "/404",
-});
-
+  robots: { index: false, follow: false },
+};
 export default function NotFound() {
   return (
     <>
@@ -23,13 +22,13 @@ export default function NotFound() {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href="/"
-            className="rounded-[10px] bg-[var(--green)] px-6 py-3 text-sm font-semibold text-[var(--on-accent)] no-underline"
+            className="btn btn-primary btn-md no-underline"
           >
             Go home
           </Link>
           <Link
             href="/login"
-            className="rounded-[10px] border border-[var(--card-border)] px-6 py-3 text-sm text-[var(--muted)] no-underline hover:text-[var(--text)]"
+            className="btn btn-ghost btn-md no-underline"
           >
             Sign in
           </Link>

@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "postinstall": "node scripts/sync-ckeditor.mjs",
+    "build": "prisma generate && node scripts/sync-ckeditor.mjs && next build",
     "start": "next start",
     "start:prod": "prisma migrate deploy && next start",
     "lint": "eslint",
@@ -29,15 +30,15 @@
     "grant:credits": "node scripts/grant-credits.mjs",
     "admin:password": "node scripts/set-admin-password.mjs",
     "icons:generate": "node scripts/generate-favicons.mjs",
+    "ckeditor:sync": "node scripts/sync-ckeditor.mjs",
     "prod:check": "node scripts/production-check.mjs",
     "prod:ensure-env": "node scripts/ensure-indexer-env.mjs",
     "prod:deploy": "powershell -File scripts/deploy-from-local.ps1"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-react": "^11.2.0",
     "@prisma/client": "^6.19.3",
     "@react-oauth/google": "^0.13.5",
-    "ckeditor5": "^48.2.0",
+    "ckeditor4": "4.22.1",
     "google-auth-library": "^10.7.0",
     "nanoid": "^5.1.11",
     "next": "16.2.9",

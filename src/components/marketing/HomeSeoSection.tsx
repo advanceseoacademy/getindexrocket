@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AnimateIn } from "@/components/ui/AnimateIn";
 import { APP_NAME } from "@/lib/brand";
+import { LANDING_PAGES } from "@/lib/landing-pages";
 
 export function HomeSeoSection() {
   return (
@@ -30,19 +31,29 @@ export function HomeSeoSection() {
               data they can trust.
             </p>
           </div>
-          <div className="mt-8 flex flex-wrap gap-4 text-sm">
-            <Link href="/features" className="text-[var(--green)] no-underline hover:underline">
+          <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+            <Link href="/features" className="text-link">
               All features →
             </Link>
-            <Link href="/how-it-works" className="text-[var(--green)] no-underline hover:underline">
+            <Link href="/how-it-works" className="text-link">
               How it works →
             </Link>
-            <Link href="/pricing" className="text-[var(--green)] no-underline hover:underline">
+            <Link href="/pricing" className="text-link">
               Pricing →
             </Link>
-            <Link href="/refund-policy" className="text-[var(--green)] no-underline hover:underline">
+            <Link href="/faq" className="text-link">
+              FAQ →
+            </Link>
+            <Link href="/refund-policy" className="text-link">
               Refund policy →
             </Link>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {LANDING_PAGES.map((page) => (
+              <Link key={page.slug} href={`/${page.slug}`} className="tag no-underline text-xs">
+                {page.breadcrumbLabel}
+              </Link>
+            ))}
           </div>
         </AnimateIn>
       </div>

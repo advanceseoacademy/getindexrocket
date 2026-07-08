@@ -23,10 +23,10 @@ export function NavLoggedInActions({
   }
 
   return (
-    <div className="nav-actions flex min-h-10 min-w-[11.5rem] shrink-0 items-center justify-end gap-3 sm:min-w-[17rem]">
+    <div className="nav-actions flex min-h-10 shrink-0 items-center justify-end gap-2 sm:gap-3">
       {creditBalance != null && (
-        <span className="hidden text-base text-[var(--muted)] sm:inline">
-          {creditBalance} credits
+        <span className="rounded-full border border-[var(--card-border)] bg-[var(--bg2)] px-2.5 py-1 text-xs font-medium tabular-nums text-[var(--muted)] sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-base">
+          {creditBalance} cr
         </span>
       )}
       {isAdmin && showAdminNav ? (

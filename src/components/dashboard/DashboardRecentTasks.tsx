@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { DashboardEmptyState } from "@/components/dashboard/dashboard-ui";
 import { RecentTaskCard } from "@/components/dashboard/RecentTaskCard";
 import { invalidateCache, invalidateDashboardCache } from "@/lib/client-cache";
 import { navigateDashboard } from "@/lib/dashboard-nav";
@@ -92,7 +93,17 @@ export function DashboardRecentTasks({ tasks, onTasksChange }: DashboardRecentTa
 
       <div className="mt-4 space-y-3">
         {filtered.length === 0 ? (
-          <p className="py-6 text-center text-sm text-[var(--muted)]">No tasks yet</p>
+          <DashboardEmptyState
+            compact
+            title={tasks.length === 0 ? "No tasks yet" : "No tasks in this tab"}
+            description={
+              tasks.length === 0
+                ? "Submit URLs from the dashboard to see them here."
+                : "Try another tab to see more tasks."
+            }
+            actionLabel={tasks.length === 0 ? "Submit URLs" : undefined}
+            onAction={tasks.length === 0 ? () => navigateDashboard("/dashboard") : undefined}
+          />
         ) : (
           filtered.map((task) => (
             <RecentTaskCard

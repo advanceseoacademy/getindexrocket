@@ -1,63 +1,20 @@
 import Link from "next/link";
-import { APP_NAME } from "@/lib/brand";
+import { SectionHeader } from "@/components/marketing/SectionHeader";
+import { CaseStudyCards } from "@/components/marketing/trust/CaseStudyCards";
+import { CustomerLogos } from "@/components/marketing/trust/CustomerLogos";
+import { TestimonialsGrid } from "@/components/marketing/trust/TestimonialsGrid";
 import { AnimateIn } from "@/components/ui/AnimateIn";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { Icon } from "@/components/ui/Icon";
+import { APP_NAME } from "@/lib/brand";
+import {
+  COMPARISON_ROWS,
+  FEATURE_CARDS,
+  HOW_IT_WORKS,
+  USE_CASES,
+} from "@/lib/home-content";
+import { TRUST_BADGES } from "@/lib/trust-content";
 import { FAQ_ITEMS } from "./faq-data";
-
-const FEATURES = [
-  {
-    title: "Backlink submissions",
-    desc: "Submit guest posts, niche edits, and third-party URLs — no Search Console access required.",
-  },
-  {
-    title: "Fast discovery signals",
-    desc: "URLs are pushed through our discovery pipeline for rapid search engine discovery workflows.",
-  },
-  {
-    title: "Live pipeline tracking",
-    desc: "Track Submitted, Processing, Crawled, or Refunded status for every URL in one dashboard.",
-  },
-  {
-    title: "Bulk URL paste",
-    desc: "Paste URL lists line-by-line from your dashboard — up to 10,000 URLs per submission batch.",
-  },
-  {
-    title: "Auto credit refund",
-    desc: "If crawl verification fails, your credit is automatically returned — no support ticket needed.",
-  },
-  {
-    title: "Credit-based billing",
-    desc: "Simple pricing: 1 credit per URL. Credits stay on your account while it is active.",
-  },
-];
-
-const STEPS = [
-  {
-    step: "01",
-    title: "Submit your URL",
-    desc: "Paste a single backlink or bulk URL list. One credit per URL.",
-  },
-  {
-    step: "02",
-    title: "Discovery begins",
-    desc: "We process your URL through our indexing network which triggers search engine discovery signals.",
-  },
-  {
-    step: "03",
-    title: "Crawl verification",
-    desc: "The system verifies the host is reachable. Failed crawls trigger an automatic credit refund.",
-  },
-  {
-    step: "04",
-    title: "Monitor results",
-    desc: "Watch live status in your dashboard. Submitted means signals were sent — indexing depends on Google.",
-  },
-];
-
-const USE_CASES = [
-  { title: "Link builders", desc: "Index guest posts and outreach placements without asking site owners for GSC access." },
-  { title: "SEO agencies", desc: "Run bulk campaigns, track client URLs, and report honest pipeline status." },
-  { title: "Affiliate marketers", desc: "Push new money pages and tier-1 content through discovery faster." },
-];
 
 const PLATFORMS = [
   "Guest post articles",
@@ -70,177 +27,374 @@ const PLATFORMS = [
   "Press releases",
   "Product pages",
   "Directory citations",
-];
+] as const;
+
+const FAQ_PREVIEW = FAQ_ITEMS.slice(0, 4);
+
+function MidPageCta({
+  title,
+  desc,
+  primaryHref = "/register",
+  primaryLabel = "Create free account",
+  secondaryHref,
+  secondaryLabel,
+}: {
+  title: string;
+  desc: string;
+  primaryHref?: string;
+  primaryLabel?: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+}) {
+  return (
+    <AnimateIn variant="scale">
+      <div className="ui-card ui-card-accent px-6 py-10 text-center md:px-12 md:py-14">
+        <h3 className="text-xl font-bold md:text-2xl">{title}</h3>
+        <p className="section-desc mx-auto mt-3 max-w-lg">{desc}</p>
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <ButtonLink href={primaryHref} fullWidth className="sm:w-auto">
+            {primaryLabel}
+          </ButtonLink>
+          {secondaryHref && secondaryLabel && (
+            <ButtonLink href={secondaryHref} variant="ghost" fullWidth className="sm:w-auto">
+              {secondaryLabel}
+            </ButtonLink>
+          )}
+        </div>
+      </div>
+    </AnimateIn>
+  );
+}
+
+function ComparisonCell({ value }: { value: boolean | string }) {
+  if (value === true) {
+    return (
+      <span className="inline-flex items-center justify-center gap-1.5 font-medium text-[var(--success)]">
+        <Icon name="check" size={16} className="shrink-0" />
+        Yes
+      </span>
+    );
+  }
+  if (value === false) {
+    return (
+      <span className="inline-flex items-center justify-center gap-1.5 text-[var(--muted)]">
+        <Icon name="x" size={16} className="shrink-0 opacity-70" />
+        No
+      </span>
+    );
+  }
+  return <span className="text-[var(--muted)]">{value}</span>;
+}
 
 export function HomeSections() {
   return (
     <>
-      <section className="site-container py-12">
-        <div className="grid gap-8 rounded-2xl border border-[var(--card-border)] bg-[var(--bg2)] px-6 py-10 sm:grid-cols-3 md:px-10">
-          {[
-            ["1 credit", "Per URL submitted"],
-            ["Pay as", "You go credits"],
-            ["Live", "Status tracking"],
-          ].map(([val, lbl], i) => (
-            <AnimateIn key={lbl} delay={i * 80} variant="scale">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-[var(--green)]">{val}</p>
-                <p className="mt-1 text-sm text-[var(--muted)]">{lbl}</p>
-              </div>
-            </AnimateIn>
-          ))}
+      <section className="section-pad-sm border-y border-[var(--card-border)] bg-[var(--bg2)]/50">
+        <div className="site-container">
+          <CustomerLogos />
         </div>
       </section>
 
-      <section id="features" className="section-below-fold site-container py-20">
-        <AnimateIn>
-          <h2 className="text-2xl font-bold md:text-3xl">
-            Everything you need to push URLs into the index pipeline
-          </h2>
-          <p className="mt-3 max-w-2xl text-[var(--muted)]">
-            From a single guest post to thousands of backlinks — submit, track, and report in one platform.
-          </p>
-        </AnimateIn>
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f, i) => (
-            <AnimateIn key={f.title} delay={i * 60}>
-              <div className="hover-lift h-full rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6">
-                <h3 className="font-semibold">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{f.desc}</p>
-              </div>
+      <section id="features" className="section-below-fold section-pad site-container">
+        <SectionHeader
+          eyebrow="Features"
+          title="Built for honest backlink indexing"
+          desc="Everything link builders need — from bulk submission to live pipeline tracking — without false indexing guarantees."
+        />
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+          {FEATURE_CARDS.map((f, i) => (
+            <AnimateIn key={f.title} delay={i * 50}>
+              <article className="ui-card hover-lift group h-full">
+                <span className="icon-box" aria-hidden>
+                  <Icon name={f.icon} size={20} />
+                </span>
+                <h3 className="mt-5 text-base font-semibold md:text-lg">{f.title}</h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-[var(--muted)]">{f.desc}</p>
+              </article>
             </AnimateIn>
           ))}
         </div>
+        <div className="mt-14">
+          <MidPageCta
+            title="Start indexing your first backlink today"
+            desc="Create a free account, buy credits when you're ready, and submit URLs in under 60 seconds."
+            secondaryHref="/pricing"
+            secondaryLabel="View pricing"
+          />
+        </div>
       </section>
 
-      <section className="site-container py-12">
+      <section className="section-below-fold section-pad bg-[var(--bg2)]/40">
+        <div className="site-container">
+          <SectionHeader
+            eyebrow="Why switch"
+            title={`${APP_NAME} vs traditional indexers`}
+            desc="Most indexers hide behind vague 'indexed' labels. We show a real pipeline — and refund credits when crawls fail."
+          />
+          <div className="ui-card mt-10 overflow-hidden p-0">
+            <div className="hidden md:grid md:grid-cols-[1.4fr_1fr_1fr]">
+              <div className="border-b border-[var(--card-border)] bg-[var(--bg3)] px-6 py-4 text-sm font-semibold">
+                Feature
+              </div>
+              <div className="border-b border-l border-[var(--card-border)] bg-[var(--accent-05)] px-6 py-4 text-center text-sm font-semibold text-[var(--green)]">
+                {APP_NAME}
+              </div>
+              <div className="border-b border-l border-[var(--card-border)] bg-[var(--bg3)] px-6 py-4 text-center text-sm font-semibold text-[var(--muted)]">
+                Traditional indexers
+              </div>
+              {COMPARISON_ROWS.map((row, i) => (
+                <div key={row.feature} className="contents">
+                  <div
+                    className={`px-6 py-4 text-sm ${i < COMPARISON_ROWS.length - 1 ? "border-b border-[var(--card-border)]" : ""}`}
+                  >
+                    {row.feature}
+                  </div>
+                  <div
+                    className={`border-l border-[var(--card-border)] bg-[var(--accent-03)] px-6 py-4 text-center text-sm ${i < COMPARISON_ROWS.length - 1 ? "border-b" : ""}`}
+                  >
+                    <ComparisonCell value={row.us} />
+                  </div>
+                  <div
+                    className={`border-l border-[var(--card-border)] px-6 py-4 text-center text-sm ${i < COMPARISON_ROWS.length - 1 ? "border-b border-[var(--card-border)]" : ""}`}
+                  >
+                    <ComparisonCell value={row.them} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="divide-y divide-[var(--card-border)] md:hidden">
+              {COMPARISON_ROWS.map((row) => (
+                <div key={row.feature} className="p-4">
+                  <p className="text-sm font-medium">{row.feature}</p>
+                  <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-lg bg-[var(--accent-05)] p-3 text-center">
+                      <p className="mb-1.5 text-xs font-semibold text-[var(--green)]">{APP_NAME}</p>
+                      <ComparisonCell value={row.us} />
+                    </div>
+                    <div className="rounded-lg bg-[var(--bg3)] p-3 text-center">
+                      <p className="mb-1.5 text-xs font-semibold text-[var(--muted)]">Others</p>
+                      <ComparisonCell value={row.them} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how" className="section-below-fold section-pad site-container">
+        <SectionHeader
+          eyebrow="How it works"
+          title="Four steps to discovery"
+          desc="A transparent pipeline — you always see what happened and what's still in progress."
+        />
+        <ol className="mt-12 grid list-none gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          {HOW_IT_WORKS.map((s, i) => (
+            <li key={s.step}>
+              <AnimateIn delay={i * 70}>
+              <article className="ui-card ui-card-muted hover-lift relative h-full">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="icon-box icon-box-lg" aria-hidden>
+                    <Icon name={s.icon} size={22} />
+                  </span>
+                  <span className="text-xs font-bold tracking-wider text-[var(--green)] opacity-70">{s.step}</span>
+                </div>
+                <h3 className="mt-5 font-semibold">{s.title}</h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-[var(--muted)]">{s.desc}</p>
+              </article>
+              </AnimateIn>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-10 text-center">
+          <Link href="/how-it-works" className="text-link inline-flex items-center gap-1.5 text-sm">
+            Read the full technical breakdown
+            <Icon name="arrow-right" size={16} />
+          </Link>
+        </div>
+      </section>
+
+      <section className="site-container section-pad-sm">
         <AnimateIn>
-          <div className="rounded-2xl border border-[var(--accent-25)] bg-[var(--accent-05)] px-6 py-10 text-center md:px-10">
-            <h2 className="text-xl font-bold md:text-2xl">Backlink not crawled? Credit refunded automatically.</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
-              If crawl verification fails, the URL is marked <strong className="text-[var(--text)]">Refunded</strong>{" "}
-              and 1 credit is returned to your balance — instantly, no ticket needed. We do not guarantee
-              Google indexing, but you never lose credits on failed crawls.
-            </p>
-            <Link
-              href="/refund-policy"
-              className="mt-5 inline-flex text-sm font-medium text-[var(--green)] no-underline hover:underline"
-            >
-              Read full refund policy →
-            </Link>
+          <div className="ui-card ui-card-accent px-6 py-10 md:px-10">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="max-w-2xl">
+                <h2 className="section-title text-xl md:text-2xl">
+                  Backlink not crawled? Credit refunded automatically.
+                </h2>
+                <p className="section-desc mt-3">
+                  If crawl verification fails, the URL is marked{" "}
+                  <strong className="font-semibold text-[var(--text)]">Refunded</strong> and 1 credit returns to your
+                  balance — instantly. We don&apos;t guarantee Google indexing, but you never lose credits on failed
+                  crawls.
+                </p>
+              </div>
+              <ButtonLink href="/refund-policy" variant="ghost" className="shrink-0 self-start md:self-center">
+                Refund policy
+                <Icon name="arrow-right" size={16} />
+              </ButtonLink>
+            </div>
           </div>
         </AnimateIn>
       </section>
 
-      <section id="how" className="section-below-fold site-container py-20">
-        <AnimateIn>
-          <h2 className="text-2xl font-bold md:text-3xl">How it works</h2>
-          <p className="mt-3 text-[var(--muted)]">
-            A transparent four-step pipeline — you always see what happened and what is still in progress.
-          </p>
-        </AnimateIn>
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((s, i) => (
-            <AnimateIn key={s.step} delay={i * 70}>
-              <div className="hover-lift h-full rounded-2xl border border-[var(--card-border)] bg-[var(--bg2)] p-6">
-                <span className="text-sm font-semibold text-[var(--green)]">Step {s.step}</span>
-                <h3 className="mt-2 text-lg font-semibold">{s.title}</h3>
-                <p className="mt-2 text-sm text-[var(--muted)]">{s.desc}</p>
-              </div>
-            </AnimateIn>
-          ))}
-        </div>
-      </section>
-
-      <section className="section-below-fold site-container py-20">
-        <AnimateIn>
-          <h2 className="text-2xl font-bold md:text-3xl">Who uses {APP_NAME}</h2>
-        </AnimateIn>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+      <section className="section-below-fold section-pad site-container">
+        <SectionHeader title={`Who uses ${APP_NAME}`} desc="Built for anyone indexing URLs they don't own." />
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
           {USE_CASES.map((u, i) => (
-            <AnimateIn key={u.title} delay={i * 80}>
-              <div className="hover-lift h-full rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6">
-                <h3 className="font-semibold">{u.title}</h3>
-                <p className="mt-2 text-sm text-[var(--muted)]">{u.desc}</p>
-              </div>
+            <AnimateIn key={u.title} delay={i * 70}>
+              <article className="ui-card hover-lift h-full">
+                <span className="icon-box icon-box-blue" aria-hidden>
+                  <Icon name={u.icon} size={20} />
+                </span>
+                <h3 className="mt-4 font-semibold">{u.title}</h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-[var(--muted)]">{u.desc}</p>
+              </article>
             </AnimateIn>
           ))}
         </div>
       </section>
 
-      <section className="section-below-fold site-container py-20">
-        <AnimateIn>
-          <h2 className="text-2xl font-bold md:text-3xl">Supported URL types</h2>
-          <p className="mt-3 text-[var(--muted)]">
-            Submit any valid public HTTP/HTTPS URL from these common third-party hosts.
-          </p>
-        </AnimateIn>
-        <div className="mt-8 flex flex-wrap gap-3">
+      <section className="section-below-fold section-pad site-container">
+        <SectionHeader
+          eyebrow="Case studies"
+          title="Real workflows from SEO teams"
+          desc="How agencies and link builders use our pipeline for guest posts, niche edits, and bulk campaigns."
+        />
+        <div className="mt-12">
+          <CaseStudyCards compact />
+        </div>
+        <div className="mt-8 text-center">
+          <Link href="/case-studies" className="text-link inline-flex items-center gap-1.5 text-sm">
+            View all case studies
+            <Icon name="arrow-right" size={16} />
+          </Link>
+        </div>
+      </section>
+
+      <section className="section-below-fold section-pad bg-[var(--bg2)]/40">
+        <div className="site-container">
+          <TestimonialsGrid />
+        </div>
+      </section>
+
+      <section className="section-below-fold section-pad site-container">
+        <SectionHeader
+          title="Supported URL types"
+          desc="Submit any valid public HTTP/HTTPS URL from these common third-party hosts."
+        />
+        <div className="mt-8 flex flex-wrap gap-2.5 md:gap-3">
           {PLATFORMS.map((p, i) => (
-            <AnimateIn key={p} delay={i * 40} variant="fade-in">
-              <span className="inline-block rounded-lg border border-[var(--card-border)] bg-[var(--bg2)] px-4 py-2 text-sm text-[var(--muted)] transition-colors hover:border-[var(--blue-30)] hover:text-[var(--text)]">
-                {p}
-              </span>
+            <AnimateIn key={p} delay={i * 35} variant="fade-in">
+              <span className="tag">{p}</span>
             </AnimateIn>
           ))}
         </div>
       </section>
 
-      <section id="pricing-preview" className="section-below-fold site-container py-12">
+      <section id="pricing-preview" className="site-container section-pad-sm">
         <AnimateIn>
-          <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--bg2)] px-6 py-10 text-center md:px-10">
-            <h2 className="text-2xl font-bold md:text-3xl">Simple credit pricing</h2>
-            <p className="mx-auto mt-3 max-w-xl text-[var(--muted)]">
-              1 credit = 1 URL. Buy monthly membership packs — Starter $10 (50 credits),
-              Pro $20 (110 credits), Agency $50 (270 credits).
+          <div className="ui-card ui-card-muted px-6 py-10 text-center md:px-12 md:py-14">
+            <p className="eyebrow">Pricing</p>
+            <h2 className="section-title mt-1">Simple credit pricing</h2>
+            <p className="section-desc mx-auto mt-3 max-w-xl">
+              <strong className="font-semibold text-[var(--text)]">1 credit = 1 URL.</strong> Monthly membership packs —
+              Starter $10 (50 credits), Pro $20 (110 credits), Agency $50 (270 credits).
             </p>
-            <Link
-              href="/pricing"
-              className="btn-primary mt-8 inline-flex rounded-[10px] bg-[var(--green)] px-8 py-3.5 font-semibold text-[var(--on-accent)] no-underline"
-            >
-              View all plans →
-            </Link>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <ButtonLink href="/register" fullWidth className="sm:w-auto">
+                Create free account
+              </ButtonLink>
+              <ButtonLink href="/pricing" variant="ghost" fullWidth className="sm:w-auto">
+                Compare all plans
+                <Icon name="arrow-right" size={16} />
+              </ButtonLink>
+            </div>
           </div>
         </AnimateIn>
       </section>
 
-      <section id="faq" className="section-below-fold site-container py-20">
-        <AnimateIn>
-          <h2 className="text-2xl font-bold md:text-3xl">Frequently asked questions</h2>
-        </AnimateIn>
-        <div className="mt-10 space-y-4">
-          {FAQ_ITEMS.map((item, i) => (
+      <section id="faq" className="section-below-fold section-pad site-container">
+        <SectionHeader
+          eyebrow="FAQ"
+          title="Common questions"
+          desc="Quick answers before you sign up. See the full FAQ for billing, bulk submit, and refund details."
+        />
+        <div className="mt-10 space-y-3">
+          {FAQ_PREVIEW.map((item, i) => (
             <AnimateIn key={item.q} delay={i * 50}>
-              <details className="faq-item group rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5">
-                <summary className="cursor-pointer font-medium">{item.q}</summary>
+              <details className="faq-item ui-card group p-5 open:border-[var(--accent-20)]">
+                <summary className="cursor-pointer list-none font-medium [&::-webkit-details-marker]:hidden">
+                  <span className="flex items-center justify-between gap-4">
+                    {item.q}
+                    <span className="faq-toggle" aria-hidden>
+                      +
+                    </span>
+                  </span>
+                </summary>
                 <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{item.a}</p>
               </details>
             </AnimateIn>
           ))}
         </div>
+        <div className="mt-8 text-center">
+          <Link href="/faq" className="text-link inline-flex items-center gap-1.5 text-sm">
+            View all {FAQ_ITEMS.length} questions
+            <Icon name="arrow-right" size={16} />
+          </Link>
+        </div>
       </section>
 
-      <section className="site-container py-20">
+      <section className="site-container section-pad-sm">
+        <AnimateIn>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {TRUST_BADGES.map((badge) => (
+              <span key={badge} className="pill text-[var(--muted)]">
+                <Icon name="shield" size={14} className="text-[var(--green)]" />
+                {badge}
+              </span>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-xs text-[var(--muted)]">
+            <Link href="/security" className="text-link">
+              Security
+            </Link>
+            {" · "}
+            <Link href="/privacy" className="text-link">
+              Privacy
+            </Link>
+            {" · "}
+            <Link href="/refund-policy" className="text-link">
+              Refunds
+            </Link>
+            {" · "}
+            <Link href="/contact" className="text-link">
+              Support
+            </Link>
+          </p>
+        </AnimateIn>
+      </section>
+
+      <section className="site-container pb-16 pt-2 md:pb-24">
         <AnimateIn variant="scale">
-          <div className="hover-lift rounded-2xl border border-[var(--green)] bg-[var(--accent-05)] p-10 text-center">
-            <h2 className="text-2xl font-bold">Ready to submit your first backlink?</h2>
-            <p className="mx-auto mt-3 max-w-lg text-[var(--muted)]">
-              Create an account, buy credits, and watch your URLs move through the live pipeline.
+          <div className="ui-card ui-card-accent hover-lift border-[var(--green)] p-8 text-center md:p-14">
+            <h2 className="section-title">Ready to get your backlinks discovered?</h2>
+            <p className="section-desc mx-auto mt-4 max-w-lg">
+              Join link builders using {APP_NAME} for honest pipeline tracking, bulk submission, and automatic credit
+              protection.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Link
-                href="/register"
-                className="btn-primary rounded-[10px] bg-[var(--green)] px-8 py-3.5 font-semibold text-[var(--on-accent)] no-underline"
-              >
-                Create account
-              </Link>
-              <Link
-                href="/login"
-                className="btn-ghost rounded-[10px] border border-[var(--card-border)] px-8 py-3.5 text-[var(--muted)] no-underline hover:text-[var(--text)]"
-              >
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <ButtonLink href="/register" size="lg" fullWidth className="sm:w-auto">
+                Create free account
+              </ButtonLink>
+              <ButtonLink href="/login" variant="ghost" size="lg" fullWidth className="sm:w-auto">
                 Sign in
-              </Link>
+              </ButtonLink>
             </div>
+            <p className="mt-6 text-xs text-[var(--muted)]">
+              No credit card required to create an account · 1 credit per URL · Auto-refund on crawl fail
+            </p>
           </div>
         </AnimateIn>
       </section>

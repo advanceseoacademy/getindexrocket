@@ -7,6 +7,7 @@ type ArticleJsonLdInput = {
   publishedAt: string;
   updatedAt: string;
   authorName?: string | null;
+  imageUrl?: string;
 };
 
 export function ArticleJsonLd({
@@ -16,6 +17,7 @@ export function ArticleJsonLd({
   publishedAt,
   updatedAt,
   authorName,
+  imageUrl,
 }: ArticleJsonLdInput) {
   const url = `${APP_URL}/blog/${slug}`;
   const data = {
@@ -24,6 +26,7 @@ export function ArticleJsonLd({
     headline: title,
     description,
     url,
+    ...(imageUrl ? { image: [imageUrl] } : {}),
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": url,

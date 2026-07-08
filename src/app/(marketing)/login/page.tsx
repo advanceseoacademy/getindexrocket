@@ -14,11 +14,12 @@ export const metadata = buildPageMetadata({
   description: `Sign in to your ${APP_NAME} account to submit backlinks and track indexing status.`,
   path: "/login",
   index: false,
+  keywords: ["backlink indexing login", "url indexing sign in", "GetIndexRocket login"],
 });
 
 export default async function LoginPage() {
   const user = await getSessionUser();
-  if (user && isAdmin(user)) redirect("/admin");
+  if (user) redirect(isAdmin(user) ? "/admin" : "/dashboard");
 
   return (
     <>

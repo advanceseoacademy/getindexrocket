@@ -1,4 +1,4 @@
-export const APP_NAME = "GetindexRocket";
+export const APP_NAME = "GetIndexRocket";
 export const APP_SLUG = "getindexrocket";
 export const APP_DOMAIN = "getindexrocket.com";
 export const APP_URL =
