@@ -24,7 +24,7 @@ export const PRICING_FAQ = [
   },
   {
     q: "Is there a free trial?",
-    a: "Create a free account to explore the dashboard. Credits are purchased via membership — start with Starter at $10/mo if you're testing a small batch.",
+    a: "Yes. New accounts get 5 free credits on signup (email or Google) so you can try the pipeline immediately. Buy more credits via membership when you're ready.",
   },
   {
     q: "Can I upgrade or change plans?",

@@ -15,4 +15,7 @@ export const BMC_MEMBERSHIP_URL =
 /** User-facing cost: 1 credit = 1 URL submitted */
 export const CREDIT_PER_URL = 1;
 
+/** Free credits granted on new account signup (email or Google). */
+export const SIGNUP_BONUS_CREDITS = 5;
+
 export type IndexingTier = "standard" | "instant";

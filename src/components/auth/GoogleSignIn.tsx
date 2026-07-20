@@ -4,6 +4,7 @@ import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { clearAuthClientCache } from "@/lib/auth-client-cache";
+import { getOrCreateDeviceId } from "@/lib/device-id";
 
 type GoogleSignInProps = {
   mode: "login" | "register";
@@ -46,7 +47,10 @@ export function GoogleSignIn({ mode }: GoogleSignInProps) {
       const res = await fetch("/api/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential }),
+        body: JSON.stringify({
+          credential,
+          deviceId: getOrCreateDeviceId(),
+        }),
       });
       const data = await res.json();
       if (!res.ok) {

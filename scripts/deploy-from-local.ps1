@@ -1,7 +1,7 @@
 # Deploy GetindexRocket to VPS from local Windows (requires SSH key — run setup-ssh-key.ps1 first)
 $ErrorActionPreference = "Stop"
 $hostAlias = "getindexrocket-vps"
-$localEnv = Join-Path $PSScriptRoot ".." ".env" | Resolve-Path -ErrorAction SilentlyContinue
+$localEnv = Join-Path (Join-Path $PSScriptRoot "..") ".env" | Resolve-Path -ErrorAction SilentlyContinue
 
 Write-Host "Deploying to $hostAlias ..." -ForegroundColor Cyan
 

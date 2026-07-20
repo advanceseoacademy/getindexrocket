@@ -143,7 +143,7 @@ export const CHAT_KNOWLEDGE: ChatKnowledge[] = [
       "অ্যাকাউন্ট",
     ],
     facts:
-      "Create a free account with Google or email, then buy credits when you're ready. Sign in anytime from the header.",
+      "Create a free account with Google or email and get 5 free credits instantly. Buy more credits when you're ready. Sign in anytime from the header.",
     links: [
       { label: "Create account", href: "/register" },
       { label: "Sign in", href: "/login" },

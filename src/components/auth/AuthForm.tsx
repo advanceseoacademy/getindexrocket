@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { clearAuthClientCache } from "@/lib/auth-client-cache";
+import { getOrCreateDeviceId } from "@/lib/device-id";
 
 type AuthFormProps = {
   mode: "login" | "register";
@@ -30,7 +31,12 @@ export function AuthForm({ mode }: AuthFormProps) {
       const res = await fetch(`/api/auth/${mode}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name: name || undefined }),
+        body: JSON.stringify({
+          email,
+          password,
+          name: name || undefined,
+          ...(mode === "register" ? { deviceId: getOrCreateDeviceId() } : {}),
+        }),
       });
       const data = await res.json();
       if (!res.ok) {

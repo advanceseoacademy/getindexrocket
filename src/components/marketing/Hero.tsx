@@ -1,6 +1,6 @@
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Icon } from "@/components/ui/Icon";
-import { APP_NAME } from "@/lib/brand";
+import { APP_NAME, SIGNUP_BONUS_CREDITS } from "@/lib/brand";
 import { TRUST_STATS } from "@/lib/home-content";
 
 const PIPELINE_ROWS = [
@@ -10,7 +10,11 @@ const PIPELINE_ROWS = [
   ["Refunded", "https://example.com/backlink", "var(--amber)"],
 ] as const;
 
-const TRUST_BULLETS = ["No GSC required", "Bulk up to 10K URLs", "Credits refunded on fail"] as const;
+const TRUST_BULLETS = [
+  `${SIGNUP_BONUS_CREDITS} free credits on signup`,
+  "No GSC required",
+  "Credits refunded on fail",
+] as const;
 
 export function Hero() {
   return (
@@ -29,7 +33,7 @@ export function Hero() {
           <div className="max-w-xl">
             <div className="animate-hero-in pill mb-6">
               <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--green)]" />
-              Backlink indexing for URLs you don&apos;t own
+              New accounts get {SIGNUP_BONUS_CREDITS} free credits
             </div>
 
             <h1 id="hero-heading" className="animate-hero-in-delay-1 text-display">
@@ -41,12 +45,16 @@ export function Hero() {
               Submit guest posts, niche edits, and outreach links without Search Console access.
               {APP_NAME} sends real discovery signals and shows exactly what happened —{" "}
               <strong className="font-semibold text-[var(--text)]">1 credit = 1 URL</strong>, auto-refund
-              if crawl fails.
+              if crawl fails. Create a free account and get{" "}
+              <strong className="font-semibold text-[var(--text)]">
+                {SIGNUP_BONUS_CREDITS} free credits
+              </strong>{" "}
+              instantly.
             </p>
 
             <div className="animate-hero-in-delay-3 mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <ButtonLink href="/register" size="lg">
-                Start indexing — free account
+                Get {SIGNUP_BONUS_CREDITS} free credits
               </ButtonLink>
               <ButtonLink href="/how-it-works" variant="ghost" size="lg">
                 See how it works

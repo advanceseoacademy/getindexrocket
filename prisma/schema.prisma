@@ -25,6 +25,19 @@ model User {
   memberships        Membership[]
   blogPosts          BlogPost[]
   supportTickets     SupportTicket[]
+  signupDevice       SignupDevice?
+}
+
+/** One signup per browser/device (and IP cooldown) to stop free-credit abuse. */
+model SignupDevice {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceHash String   @unique
+  ipHash     String?
+  createdAt  DateTime @default(now())
+
+  @@index([ipHash, createdAt])
 }
 
 model PaymentEvent {

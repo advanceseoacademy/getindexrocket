@@ -37,6 +37,7 @@ export async function runIndexerBatch(limit = RUN_BATCH_SIZE): Promise<RunIndexe
     where: {
       hubToken: { not: null },
       status: { notIn: ["crawled", "refunded", "failed"] },
+      OR: [{ nextRunAt: null }, { nextRunAt: { lte: now } }],
     },
     orderBy: [{ nextRunAt: "asc" }, { createdAt: "asc" }],
     take: limit,
@@ -45,7 +46,7 @@ export async function runIndexerBatch(limit = RUN_BATCH_SIZE): Promise<RunIndexe
     },
   });
 
-  const toIndexNow: { id: string; hubToken: string }[] = [];
+  const toDiscover: { id: string; hubToken: string; firstSubmit: boolean }[] = [];
 
   for (const row of pending) {
     result.processed += 1;
@@ -54,9 +55,16 @@ export async function runIndexerBatch(limit = RUN_BATCH_SIZE): Promise<RunIndexe
     try {
       if (isTerminalStatus(row.status)) continue;
 
-      if (!row.indexNowAt && row.hubToken) {
-        toIndexNow.push({ id: row.id, hubToken: row.hubToken });
-        continue;
+      // First discovery push, or re-push until a search bot hits the hub.
+      // Important: IndexNow can succeed while Google/Bing fail (ownership / API key).
+      // Without rediscovery, stuck URLs never get pushed to fixed channels.
+      if (row.hubToken && (!row.indexNowAt || !row.botHitAt)) {
+        toDiscover.push({
+          id: row.id,
+          hubToken: row.hubToken,
+          firstSubmit: !row.indexNowAt,
+        });
+        if (!row.indexNowAt) continue;
       }
 
       const refundEligible = isRefundEligible(row.createdAt, now);
@@ -113,41 +121,13 @@ export async function runIndexerBatch(limit = RUN_BATCH_SIZE): Promise<RunIndexe
     }
   }
 
-  if (toIndexNow.length > 0) {
-    const hubUrls = toIndexNow.map((r) => getHubUrl(r.hubToken));
-    const discovery = await submitHubUrlsForDiscovery(hubUrls);
+  if (toDiscover.length > 0) {
+    const discoveryResult = await pushDiscoveryBatch(toDiscover, now, result);
+    result.errors.push(...discoveryResult.errors);
 
-    if (discovery.ok || discovery.indexNowSubmitted > 0 || discovery.bingSubmitted > 0 || discovery.googleSubmitted > 0) {
-      result.indexNowSubmitted = discovery.indexNowSubmitted;
-      result.bingSubmitted = discovery.bingSubmitted;
-      result.googleSubmitted = discovery.googleSubmitted;
-      await prisma.taskUrl.updateMany({
-        where: { id: { in: toIndexNow.map((r) => r.id) } },
-        data: {
-          indexNowAt: now,
-          status: "submitted",
-          attempts: { increment: 1 },
-          nextRunAt: new Date(now.getTime() + RETRY_DELAY_MS),
-          lastError: discovery.errors[0] ?? null,
-        },
-      });
-
-      for (const row of toIndexNow) {
-        const taskId = pending.find((p) => p.id === row.id)?.task.id;
-        if (taskId) await refreshTaskAggregateStatus(taskId);
-      }
-
-      await pingDiscoveryEndpoints();
-    } else if (discovery.errors.length > 0) {
-      result.errors.push(...discovery.errors);
-      await prisma.taskUrl.updateMany({
-        where: { id: { in: toIndexNow.map((r) => r.id) } },
-        data: {
-          attempts: { increment: 1 },
-          lastError: discovery.errors[0],
-          nextRunAt: new Date(now.getTime() + RETRY_DELAY_MS),
-        },
-      });
+    for (const row of toDiscover) {
+      const taskId = pending.find((p) => p.id === row.id)?.task.id;
+      if (taskId) await refreshTaskAggregateStatus(taskId);
     }
   }
 
@@ -255,41 +235,94 @@ export async function processTask(taskId: string): Promise<RunIndexerResult> {
     errors: [],
   };
 
-  const needsIndexNow = urls.filter((u) => !u.indexNowAt && u.hubToken);
-  if (needsIndexNow.length > 0) {
-    const hubUrls = needsIndexNow.map((u) => getHubUrl(u.hubToken!));
-    const discovery = await submitHubUrlsForDiscovery(hubUrls);
-    if (discovery.ok || discovery.indexNowSubmitted > 0 || discovery.bingSubmitted > 0 || discovery.googleSubmitted > 0) {
-      result.indexNowSubmitted = discovery.indexNowSubmitted;
-      result.bingSubmitted = discovery.bingSubmitted;
-      result.googleSubmitted = discovery.googleSubmitted;
-      await prisma.taskUrl.updateMany({
-        where: { id: { in: needsIndexNow.map((u) => u.id) } },
-        data: {
-          indexNowAt: now,
-          status: "submitted",
-          attempts: { increment: 1 },
-          nextRunAt: new Date(now.getTime() + RETRY_DELAY_MS),
-          lastError: discovery.errors[0] ?? null,
-        },
-      });
-      await pingDiscoveryEndpoints();
-    } else if (discovery.errors.length > 0) {
-      result.errors.push(...discovery.errors);
-      await prisma.taskUrl.updateMany({
-        where: { id: { in: needsIndexNow.map((u) => u.id) } },
-        data: {
-          attempts: { increment: 1 },
-          lastError: discovery.errors[0],
-          nextRunAt: new Date(now.getTime() + RETRY_DELAY_MS),
-        },
-      });
-    }
+  const needsDiscover = urls
+    .filter((u) => u.hubToken && (!u.indexNowAt || !u.botHitAt))
+    .map((u) => ({
+      id: u.id,
+      hubToken: u.hubToken!,
+      firstSubmit: !u.indexNowAt,
+    }));
+
+  if (needsDiscover.length > 0) {
+    const discoveryResult = await pushDiscoveryBatch(needsDiscover, now, result);
+    result.errors.push(...discoveryResult.errors);
   }
 
   await evaluateTask(taskId);
   await refreshTaskAggregateStatus(taskId);
   return result;
+}
+
+async function pushDiscoveryBatch(
+  rows: { id: string; hubToken: string; firstSubmit: boolean }[],
+  now: Date,
+  result: RunIndexerResult,
+): Promise<{ errors: string[] }> {
+  const hubUrls = rows.map((r) => getHubUrl(r.hubToken));
+  const discovery = await submitHubUrlsForDiscovery(hubUrls);
+  const errors = [...discovery.errors];
+
+  const anySuccess =
+    discovery.ok ||
+    discovery.indexNowSubmitted > 0 ||
+    discovery.bingSubmitted > 0 ||
+    discovery.googleSubmitted > 0;
+
+  result.indexNowSubmitted += discovery.indexNowSubmitted;
+  result.bingSubmitted += discovery.bingSubmitted;
+  result.googleSubmitted += discovery.googleSubmitted;
+
+  // Prefer actionable channel errors; IndexNow-only success is still progress.
+  const lastError =
+    discovery.googleSubmitted === 0 &&
+    discovery.errors.find((e) => /google|permission|ownership/i.test(e))
+      ? discovery.errors.find((e) => /google|permission|ownership/i.test(e))!
+      : discovery.bingSubmitted === 0 &&
+          discovery.errors.find((e) => /bing|apikey|api key/i.test(e))
+        ? discovery.errors.find((e) => /bing|apikey|api key/i.test(e))!
+        : discovery.errors[0] ?? null;
+
+  if (anySuccess) {
+    const firstIds = rows.filter((r) => r.firstSubmit).map((r) => r.id);
+    const retryIds = rows.filter((r) => !r.firstSubmit).map((r) => r.id);
+
+    if (firstIds.length > 0) {
+      await prisma.taskUrl.updateMany({
+        where: { id: { in: firstIds } },
+        data: {
+          indexNowAt: now,
+          status: "submitted",
+          attempts: { increment: 1 },
+          nextRunAt: new Date(now.getTime() + RETRY_DELAY_MS),
+          lastError,
+        },
+      });
+    }
+
+    if (retryIds.length > 0) {
+      await prisma.taskUrl.updateMany({
+        where: { id: { in: retryIds } },
+        data: {
+          attempts: { increment: 1 },
+          nextRunAt: new Date(now.getTime() + RETRY_DELAY_MS),
+          lastError,
+        },
+      });
+    }
+
+    await pingDiscoveryEndpoints();
+  } else if (discovery.errors.length > 0) {
+    await prisma.taskUrl.updateMany({
+      where: { id: { in: rows.map((r) => r.id) } },
+      data: {
+        attempts: { increment: 1 },
+        lastError: discovery.errors[0],
+        nextRunAt: new Date(now.getTime() + RETRY_DELAY_MS),
+      },
+    });
+  }
+
+  return { errors };
 }
 
 async function applyBotHitStatus(

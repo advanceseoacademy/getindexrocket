@@ -6,7 +6,7 @@ import { TestimonialsGrid } from "@/components/marketing/trust/TestimonialsGrid"
 import { AnimateIn } from "@/components/ui/AnimateIn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Icon } from "@/components/ui/Icon";
-import { APP_NAME } from "@/lib/brand";
+import { APP_NAME, SIGNUP_BONUS_CREDITS } from "@/lib/brand";
 import {
   COMPARISON_ROWS,
   FEATURE_CARDS,
@@ -117,7 +117,8 @@ export function HomeSections() {
         <div className="mt-14">
           <MidPageCta
             title="Start indexing your first backlink today"
-            desc="Create a free account, buy credits when you're ready, and submit URLs in under 60 seconds."
+            desc={`Create a free account and get ${SIGNUP_BONUS_CREDITS} free credits instantly — submit your first URLs in under 60 seconds.`}
+            primaryLabel={`Get ${SIGNUP_BONUS_CREDITS} free credits`}
             secondaryHref="/pricing"
             secondaryLabel="View pricing"
           />
@@ -299,12 +300,17 @@ export function HomeSections() {
             <p className="eyebrow">Pricing</p>
             <h2 className="section-title mt-1">Simple credit pricing</h2>
             <p className="section-desc mx-auto mt-3 max-w-xl">
-              <strong className="font-semibold text-[var(--text)]">1 credit = 1 URL.</strong> Monthly membership packs —
-              Starter $10 (50 credits), Pro $20 (110 credits), Agency $50 (270 credits).
+              <strong className="font-semibold text-[var(--text)]">1 credit = 1 URL.</strong> New
+              accounts get{" "}
+              <strong className="font-semibold text-[var(--text)]">
+                {SIGNUP_BONUS_CREDITS} free credits
+              </strong>
+              . Then choose a membership — Starter $10 (50 credits), Pro $20 (110 credits), Agency $50
+              (270 credits).
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <ButtonLink href="/register" fullWidth className="sm:w-auto">
-                Create free account
+                Get {SIGNUP_BONUS_CREDITS} free credits
               </ButtonLink>
               <ButtonLink href="/pricing" variant="ghost" fullWidth className="sm:w-auto">
                 Compare all plans
@@ -382,18 +388,19 @@ export function HomeSections() {
             <h2 className="section-title">Ready to get your backlinks discovered?</h2>
             <p className="section-desc mx-auto mt-4 max-w-lg">
               Join link builders using {APP_NAME} for honest pipeline tracking, bulk submission, and automatic credit
-              protection.
+              protection. Sign up free and get {SIGNUP_BONUS_CREDITS} credits to try it.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <ButtonLink href="/register" size="lg" fullWidth className="sm:w-auto">
-                Create free account
+                Get {SIGNUP_BONUS_CREDITS} free credits
               </ButtonLink>
               <ButtonLink href="/login" variant="ghost" size="lg" fullWidth className="sm:w-auto">
                 Sign in
               </ButtonLink>
             </div>
             <p className="mt-6 text-xs text-[var(--muted)]">
-              No credit card required to create an account · 1 credit per URL · Auto-refund on crawl fail
+              {SIGNUP_BONUS_CREDITS} free credits on signup · No credit card required · 1 credit per URL ·
+              Auto-refund on crawl fail
             </p>
           </div>
         </AnimateIn>
